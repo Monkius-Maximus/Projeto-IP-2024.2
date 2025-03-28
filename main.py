@@ -1,9 +1,10 @@
 import pygame, os
 import funcoes_do_jogo as fj
 from configuracoes import *
+from torre import Torre
 
 #Limpa o terminal para fazer impressões.
-os.system('cls')
+os.system('clear')
 
 #Inicializa os módulos do Pygame.
 pygame.init()
@@ -29,20 +30,21 @@ txt_jogar, txt_jogar_rect = fj._init_txt_jogar(jogar)
 jogar.blit(txt_jogar, txt_jogar_rect) #Desenha o texto 'Jogar' no botão Jogar.
 
 # Importando as peças do xadrez.
-torre_preta, torre_preta_pequena = fj.importar_peças('torre_preta.png')
-cavalo_preto, cavalo_preto_pequeno = fj.importar_peças('cavalo_preto.png')
-bispo_preto, bispo_preto_pequeno = fj.importar_peças('bispo_preto.png')
-rainha_preta, rainha_preta_pequena = fj.importar_peças('rainha_preta.png')
-rei_preto, rei_preto_pequeno = fj.importar_peças('rei_preto.png')
-peao_preto, peao_preto_pequeno = fj.importar_peças('peao_preto.png')
+torre_preta = fj.importar_peças('torre_preta.png')
+cavalo_preto = fj.importar_peças('cavalo_preto.png')
+bispo_preto = fj.importar_peças('bispo_preto.png')
+rainha_preta = fj.importar_peças('rainha_preta.png')
+rei_preto = fj.importar_peças('rei_preto.png')
+peao_preto = fj.importar_peças('peao_preto.png')
 
-torre_branca, torre_branca_pequena = fj.importar_peças('torre_branca.png')
-cavalo_branco, cavalo_branco_pequeno = fj.importar_peças('cavalo_branco.png')
-bispo_branco, bispo_branco_pequeno = fj.importar_peças('bispo_branco.png')
-rainha_branca, rainha_branca_pequena = fj.importar_peças('rainha_branca.png')
-rei_branco, rei_branco_pequeno = fj.importar_peças('rei_branco.png')
-peao_branco, peao_branco_pequeno = fj.importar_peças('peao_branco.png')
+torre_branca = fj.importar_peças('torre_branca.png')
+cavalo_branco = fj.importar_peças('cavalo_branco.png')
+bispo_branco = fj.importar_peças('bispo_branco.png')
+rainha_branca = fj.importar_peças('rainha_branca.png')
+rei_branco = fj.importar_peças('rei_branco.png')
+peao_branco = fj.importar_peças('peao_branco.png')
 
+#Criando uma associação entre o nome de cada peça e a surface desenhável dela.
 dict_icons = {
     'torre_preta' : torre_preta,
     'cavalo_preto' : cavalo_preto,
@@ -58,6 +60,9 @@ dict_icons = {
     'rei_branco' : rei_branco,
     'peao_branco' : peao_branco,
 }
+
+#Importando o tabuleiro.
+tabuleiro = pygame.image.load('imagens/tabuleiro.png')
 
 #Loop principal do jogo.
 while usr_jogando:
@@ -75,7 +80,7 @@ while usr_jogando:
             pygame.quit()
 
             #Limpa o terminal no final.
-            os.system('cls')
+            os.system('clear')
 
             #O programa em si é finalizado.
             exit()
@@ -84,30 +89,25 @@ while usr_jogando:
         elif tela_atual == 'menu':
 
             #Eventos de menu são resolvidos e a tela atual é atualizada.
-            tela_atual = fj.eventos_menu(evento, jogar_rect)
+            tela_atual = fj.eventos_menu(evento, jogar_rect, dict_icons)
 
         #Se a tela for do jogo de xadrez, lida-se com os eventos interessantes que a tela do xadrez pode receber.
         elif tela_atual == 'xadrez':
 
             #Eventos da tela do xadrez são resolvidos e a tela atual é atualizada. A casa de destino não é enviada como parâmetro, pois, ela sempre será vazia ao checar novos eventos.
-            tela_atual, casa_origem, casa_destino = fj.eventos_xadrez(evento, casa_origem)
+            tela_atual, casa_origem = fj.eventos_xadrez(evento, casa_origem)
 
     #Desenhando as coisas no aplicativo de acordo com a tela do menu.
     if tela_atual == 'menu':
 
+        #Desenha-se o menu com o título principal e o botão de jogar.
         fj.desenhar_menu(tela, jogar, txt_menu, txt_menu_rect)
 
     #Desenhando as coisas no aplicativo de acordo com a tela do xadrez.
     elif tela_atual == 'xadrez':
 
-        #Se o tabuleiro ainda não foi criado, isto é, o usuário está começando um novo jogo.
-        if matriz_casas == []:
-
-            #Chama uma função que define as informações iniciais sobre todas as casas.
-            matriz_casas = fj.definir_casas(dict_icons)
-
         #Desenha-se o tabuleiro a partir da matriz de casas.
-        fj.desenhar_tabuleiro(tela, matriz_casas)
+        tela.blit(tabuleiro, (0, 0))
 
     #Atualiza a tela desde as últimas alterações.
     pygame.display.update()
