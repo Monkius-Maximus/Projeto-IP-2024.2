@@ -1,11 +1,12 @@
 import pygame
-from configuracoes import *
+import configuracoes as cfg
+from torre import Torre
 
 #Função feita para inicializar a tela. É chamada no início do jogo para configurar o menu.
 def _init_tela():
 
-    tela = pygame.display.set_mode(tam_tela) #O parâmetro é o tamanho da tela.
-    pygame.display.set_caption(str_janela_menu) #Define título do menu.
+    tela = pygame.display.set_mode(cfg.tam_tela) #O parâmetro é o tamanho da tela.
+    pygame.display.set_caption(cfg.str_janela_menu) #Define título do menu.
 
     return tela
 
@@ -13,15 +14,15 @@ def _init_tela():
 def _init_tit_menu():
 
     #Definindo fonte.
-    fonte_título = pygame.font.SysFont(str_fonte_menu, tam_fonte_menu)
+    fonte_título = pygame.font.SysFont(cfg.str_fonte_menu, cfg.tam_fonte_menu)
 
     #Renderiza o texto em uma superfície. Define-se: string do título, anti-aliasing e cor do título.
     antialais = True
-    txt_menu = fonte_título.render(str_menu, antialais, cor_menu)
+    txt_menu = fonte_título.render(cfg.str_menu, antialais, cfg.cor_menu)
 
     #Define a posição x e y do título do menu.
     txt_menu_rect = txt_menu.get_rect()
-    txt_menu_rect.centerx = tam_tela_x / 2
+    txt_menu_rect.centerx = cfg.tam_tela_x / 2
     txt_menu_rect.top = 30
 
     #Retorna-se a superfície final do título do menu.
@@ -31,13 +32,13 @@ def _init_tit_menu():
 def _init_jogar():
 
     #Definindo superfície e cor do botão de jogar.
-    jogar = pygame.Surface(tam_jogar) #Cria uma surface com o tamanho do botão jogar, criando algo como um retângulo.
+    jogar = pygame.Surface(cfg.tam_jogar) #Cria uma surface com o tamanho do botão jogar, criando algo como um retângulo.
 
-    jogar.fill(cor_jogar) #Pinta a surface de vermelho.
+    jogar.fill(cfg.cor_jogar) #Pinta a surface de vermelho.
 
     #Definindo posição do botão segundo o referencial da tela.
-    jogar_x = (tam_tela_x) / 2 - (tam_jogar_x / 2)
-    jogar_y = (tam_tela_y) / 2 - (tam_jogar_y / 2)
+    jogar_x = (cfg.tam_tela_x) / 2 - (cfg.tam_jogar_x / 2)
+    jogar_y = (cfg.tam_tela_y) / 2 - (cfg.tam_jogar_y / 2)
 
     #Definindo o retângulo do botão jogar e especificando a posição do seu canto superior esquerdo na tela do menu.
     jogar_rect = jogar.get_rect(topleft=(jogar_x, jogar_y))
@@ -73,8 +74,8 @@ def importar_peças(peça_png):
 
     return peça
 
-#Função para lidar com os eventos do menu.
-def eventos_menu(evento, jogar_rect, dict_icons):
+#Função para lidar com os eventos do menu. Info_peças começa sendo um dicionário vazio, pois ainda estamos no menu e o usuário ainda não escolheu jogar.
+def eventos_menu(evento, jogar_rect, dict_icons, info_peças = {}):
 
     #Quando se verifica um evento da tela menu, a tela atual é o menu. Mas, poderá mudar, caso o usuário tenha decidido mudar de tela. Exemplo: decidindo jogar o xadrez
     tela_atual = 'menu'
@@ -89,9 +90,9 @@ def eventos_menu(evento, jogar_rect, dict_icons):
             tela_atual = 'xadrez'
 
             #Como o usuário está começando a jogar agora, é necessário definir as informações iniciais das peças do tabuleiro.
-            definir_peças(dict_icons)
+            info_peças = definir_peças(dict_icons)
 
-    return tela_atual
+    return tela_atual, info_peças
 
 #Função para lidar com os eventos da tela de xadrez. Ela recebe o evento que ocorreu, e também uma variável que armazena se já há uma casa selecionada.
 def eventos_xadrez(evento, casa_origem):
@@ -189,27 +190,56 @@ def desenhar_menu(tela, jogar, txt_menu, txt_menu_rect):
     #Desenhando as coisas na tela.
 
     #Desenhando o botão jogar na tela.
-    tela.blit(jogar, (jogar_x, jogar_y))
+    tela.blit(jogar, (cfg.jogar_x, cfg.jogar_y))
 
     #Desenhando o título do menu na tela.
     tela.blit(txt_menu, txt_menu_rect)
 
-#Função que define as informações iniciais sobre as peças em cada casa.
+#Função que define as informações iniciais sobre as peças em cada casa. O dicionário é passado porque, para cada peça, é necessário saber qual é o png associado a ela de acordo com seu tipo.
 def definir_peças(dict_icons):
 
-    #Desenhando peças iniciais nas casas.
-    tabuleiro_inicial = {
-        'torre_preta' : [(7, 0), (7, 7)],
-        'cavalo_preto' : [(7, 1), (7, 6)],
-        'bispo_preto' : [(7, 2), (7, 5)],
-        'rainha_preta' : [(7, 3)],
-        'rei_preto' : [(7, 4)],
-        'peao_preto' : [(6, 0), (6, 1), (6, 2), (6, 3), (6, 4), (6, 5), (6, 6), (6, 7)],
-        
-        'torre_branca' : [(0, 0), (0, 7)],
-        'cavalo_branco' : [(0, 1), (0, 6)],
-        'bispo_branco' : [(0, 2), (0, 5)],
-        'rainha_branca' : [(0, 3)],
-        'rei_branco' : [(0, 4)],
-        'peao_branco' : [(1, 0), (1, 1), (1, 2), (1, 3), (1, 4), (1, 5), (1, 6), (1, 7)]
+    #Dicionário que irá armazenar informações sobre as peças (objetos das classes). 
+    info_peças = {
+        'pretas' : [],
+        'brancas' : []
     }
+
+    #Dicionário que mapeia a cor da peça individual ('preto', 'preta', 'branco', 'branca') para a string que representa o grupo a que pertence 'pretas' ou 'brancas'.
+    cor_info = {
+        'preta' : 'pretas',
+        'preto' : 'pretas',
+
+        'branca' : 'brancas',
+        'branco' : 'brancas'
+    }
+
+    #Para cada tipo de peça, também haverá uma lista com as casas iniciais que as peças desse tipo irão ocupar.
+    for tipo_peça, casas_iniciais in cfg.tabuleiro_inicial.items():
+
+        #O tipo de peça é definido pela peça e por sua cor. Exemplo: torre_preta.
+        peça = tipo_peça.split('_')[0]
+        cor = tipo_peça.split('_')[1]
+
+        #Criando as torres do tabuleiro inicial.
+        if peça == 'torre':
+            
+            for casa in casas_iniciais:
+                    
+                torre = Torre(cor, casa) #Cria o objeto da torre.
+                torre.criar_imagem(dict_icons[tipo_peça]) #Cria a sua imagem desenhável de acordo com seu tipo e cor.
+                grupo = cor_info[cor] #Associa ela ao grupo que pertence conforme sua cor.
+                info_peças[grupo].append(torre) #Adiciona ela no dicionário de todas as peças de acordo com seu grupo de cor.
+
+    return info_peças
+
+#Função para desenhar todas as peças no tabuleiro.
+def desenhar_peças(tela, info_peças):
+
+    #Queremos desenhar as peças de todas as cores, sejam elas pretas ou brancas.
+    for grupo_cor in info_peças:
+
+        #Para cada peça de cada grupo.
+        for peça in info_peças[grupo_cor]:
+
+            #Desenha a peça na tela.
+            peça.desenhar(tela)
