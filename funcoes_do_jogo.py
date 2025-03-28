@@ -1,6 +1,5 @@
 import pygame
 from configuracoes import *
-from casa import Casa
 
 #Função feita para inicializar a tela. É chamada no início do jogo para configurar o menu.
 def _init_tela():
@@ -72,13 +71,10 @@ def importar_peças(peça_png):
     #Redimensiona a superfície para um tamanho razoável da peça normal considerando a nossa tela.
     peça = pygame.transform.scale(peça, (80, 80))
 
-    #Redimensiona a superfície para um tamanho razoável da peça pequena considerando a nossa tela.
-    peça_pequena = pygame.transform.scale(peça, (45, 45))
-
-    return peça, peça_pequena
+    return peça
 
 #Função para lidar com os eventos do menu.
-def eventos_menu(evento, jogar_rect):
+def eventos_menu(evento, jogar_rect, dict_icons):
 
     #Quando se verifica um evento da tela menu, a tela atual é o menu. Mas, poderá mudar, caso o usuário tenha decidido mudar de tela. Exemplo: decidindo jogar o xadrez
     tela_atual = 'menu'
@@ -91,6 +87,9 @@ def eventos_menu(evento, jogar_rect):
 
             #Caso o usuário tenha apertado em Jogar, a tela atual deve se tornar a do xadrez.
             tela_atual = 'xadrez'
+
+            #Como o usuário está começando a jogar agora, é necessário definir as informações iniciais das peças do tabuleiro.
+            definir_peças(dict_icons)
 
     return tela_atual
 
@@ -115,7 +114,7 @@ def eventos_xadrez(evento, casa_origem):
             #Resposta da função começa vazia.
             resposta = None
 
-            #Se o clique foi dentro do tabuleiro.
+            #Se o clique foi dentro do tabuleiro, identifica e retorna linha e coluna da casa clicada.
             if pos_x <= 800 and pos_y <= 800:
 
                 #Identificando qual foi a linha da casa selecionada.
@@ -152,7 +151,7 @@ def eventos_xadrez(evento, casa_origem):
 
                 resposta = (linha, coluna)
 
-            #Se o clique foi fora do tabuleiro.
+            #Se o clique foi fora do tabuleiro, retorne False.
             else:
 
                 resposta = False
@@ -172,8 +171,14 @@ def eventos_xadrez(evento, casa_origem):
             casa_destino = casa_clicada
 
         print(f'{casa_origem} /// {casa_destino}')
+        
+        #Se já há uma casa de origem e uma casa de destino, limpa-se ambas para receber a próxima casa de origem e destino.
+        if casa_origem != () and casa_destino != ():
 
-    return tela_atual, casa_origem, casa_destino
+            casa_origem = ()
+            casa_destino = ()
+
+    return tela_atual, casa_origem
 
 #Função para fazer os desenhos da tela menu.
 def desenhar_menu(tela, jogar, txt_menu, txt_menu_rect):
@@ -189,44 +194,8 @@ def desenhar_menu(tela, jogar, txt_menu, txt_menu_rect):
     #Desenhando o título do menu na tela.
     tela.blit(txt_menu, txt_menu_rect)
 
-#Função que define as informações iniciais sobre todas as casas.
-def definir_casas(dict_icons):
-
-    #Criando as casas.
-    matriz_casas = [[None, None, None, None, None, None, None, None],
-                    [None, None, None, None, None, None, None, None],
-                    [None, None, None, None, None, None, None, None],
-                    [None, None, None, None, None, None, None, None],
-                    [None, None, None, None, None, None, None, None],
-                    [None, None, None, None, None, None, None, None],
-                    [None, None, None, None, None, None, None, None],
-                    [None, None, None, None, None, None, None, None]]
-    
-    #Criando a matriz de casas.
-    for i in range(64):
-
-        """Comportamento:
-
-            (linha, coluna).
-            0, 0.
-            0, 1.
-            ...
-            0, 7.
-            1, 0.
-            1, 1.
-            ...
-            1, 7.
-            ...
-            7, 7.
-
-        """
-        
-        coluna = i % 8
-        linha = i // 8
-
-        casa = Casa(linha, coluna)
-
-        matriz_casas[linha][coluna] = casa
+#Função que define as informações iniciais sobre as peças em cada casa.
+def definir_peças(dict_icons):
 
     #Desenhando peças iniciais nas casas.
     tabuleiro_inicial = {
@@ -244,25 +213,3 @@ def definir_casas(dict_icons):
         'rei_branco' : [(0, 4)],
         'peao_branco' : [(1, 0), (1, 1), (1, 2), (1, 3), (1, 4), (1, 5), (1, 6), (1, 7)]
     }
-
-    #Exemplo de valor possível para 'peça': ('torre_preta', [(7, 0), (7, 7)])
-    for peça in tabuleiro_inicial.items():
-
-        #Exemplo de valor possível para casa (no exemplo acima): (7, 0)
-        for casa in peça[1]:
-
-            linha = casa[0]
-            coluna = casa[1]
-            matriz_casas[linha][coluna].ocupar_casa(peça[0], dict_icons)
-
-    return matriz_casas
-
-#Função para fazer os desenhos da tela do xadrez.
-def desenhar_tabuleiro(tela, matriz_casas):
-
-    #Pinta a tela de roxo.
-    tela.fill('purple')
-
-    for i in matriz_casas:
-        for j in i:
-            j.print_surface(tela)
