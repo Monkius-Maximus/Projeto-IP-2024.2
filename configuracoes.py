@@ -7,9 +7,6 @@ FPS = 60
 #Sobre a tela do jogo em geral.
 tam_tela = tam_tela_x, tam_tela_y = 1000, 800
 
-#Variável armazenando a tela atual do jogo. Começa com menu.
-tela_atual = 'menu'
-
 #Sobre a tela principal (Menu).
 
 #Nome da janela.
@@ -51,10 +48,6 @@ tabuleiro_inicial = {
     'rei_branco' : [(0, 4)],
     'peao_branco' : [(1, 0), (1, 1), (1, 2), (1, 3), (1, 4), (1, 5), (1, 6), (1, 7)]
 }
-
-#Casa de origem e de destino selecionadas. Ambas começam vazias. Ex.: Se o usuário clica na casa a7, e além disso ele havia clicado anteriormente na casa a1, onde há uma torre, a torre deve ser movida de a1 para a7.
-casa_origem = ()
-casa_destino = ()
 
 #Um dicionário de mapeia os índices das colunas às colunas do xadrez.
 dict_colunas = {
