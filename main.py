@@ -1,10 +1,10 @@
 import pygame, os
 import funcoes_do_jogo as fj
-from configuracoes import *
+import configuracoes as cfg
 from torre import Torre
 
 #Limpa o terminal para fazer impressões.
-os.system('clear')
+# os.system('clear')
 
 #Inicializa os módulos do Pygame.
 pygame.init()
@@ -65,10 +65,10 @@ dict_icons = {
 tabuleiro = pygame.image.load('imagens/tabuleiro.png')
 
 #Loop principal do jogo.
-while usr_jogando:
+while cfg.usr_jogando:
 
     #Limita o FPS do programa.
-    relógio.tick(FPS)
+    relógio.tick(cfg.FPS)
 
     #Lidando com os eventos do aplicativo.
     for evento in pygame.event.get():
@@ -88,8 +88,8 @@ while usr_jogando:
         #Se a tela atual for o menu, lida-se com os eventos interessantes que o menu pode receber.
         elif tela_atual == 'menu':
 
-            #Eventos de menu são resolvidos e a tela atual é atualizada.
-            tela_atual = fj.eventos_menu(evento, jogar_rect, dict_icons)
+            #Eventos de menu são resolvidos e a tela atual é atualizada. Além disso, quando o usuário apertar em 'Jogar', as informações sobre as peças são adicionadas na variável info_peças.
+            tela_atual, info_peças = fj.eventos_menu(evento, jogar_rect, dict_icons)
 
         #Se a tela for do jogo de xadrez, lida-se com os eventos interessantes que a tela do xadrez pode receber.
         elif tela_atual == 'xadrez':
@@ -106,8 +106,11 @@ while usr_jogando:
     #Desenhando as coisas no aplicativo de acordo com a tela do xadrez.
     elif tela_atual == 'xadrez':
 
-        #Desenha-se o tabuleiro a partir da matriz de casas.
+        #Desenha-se o tabuleiro.
         tela.blit(tabuleiro, (0, 0))
+
+        #Desenham-se as peças em cima do tabuleiro.
+        fj.desenhar_peças(tela, info_peças)
 
     #Atualiza a tela desde as últimas alterações.
     pygame.display.update()
