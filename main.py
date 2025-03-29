@@ -12,6 +12,9 @@ pygame.init()
 #Variável armazenando a tela atual do jogo. Começa com menu.
 tela_atual = 'menu'
 
+#Variável que define o funcionamento do aplicativo.
+usr_jogando = True
+
 #Inicializa a tela do programa de acordo com as exigências do menu.
 tela = fj._init_tela()
 
@@ -72,7 +75,7 @@ casa_origem = ()
 casa_destino = ()
 
 #Loop principal do jogo.
-while cfg.usr_jogando:
+while usr_jogando:
 
     #Limita o FPS do programa.
     relógio.tick(cfg.FPS)
