@@ -4,10 +4,13 @@ import configuracoes as cfg
 from torre import Torre
 
 #Limpa o terminal para fazer impressões.
-# os.system('clear')
+os.system('clear')
 
 #Inicializa os módulos do Pygame.
 pygame.init()
+
+#Variável armazenando a tela atual do jogo. Começa com menu.
+tela_atual = 'menu'
 
 #Inicializa a tela do programa de acordo com as exigências do menu.
 tela = fj._init_tela()
@@ -63,6 +66,10 @@ dict_icons = {
 
 #Importando o tabuleiro.
 tabuleiro = pygame.image.load('imagens/tabuleiro.png')
+
+#Casa de origem e de destino selecionadas. Ambas começam vazias. Ex.: Se o usuário clica na casa a7, e além disso ele havia clicado anteriormente na casa a1, onde há uma torre, a torre deve ser movida de a1 para a7.
+casa_origem = ()
+casa_destino = ()
 
 #Loop principal do jogo.
 while cfg.usr_jogando:
