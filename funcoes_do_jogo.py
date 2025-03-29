@@ -5,7 +5,24 @@ from torre import Torre
 #Função feita para inicializar a tela. É chamada no início do jogo para configurar o menu.
 def _init_tela():
 
-    tela = pygame.display.set_mode(cfg.tam_tela) #O parâmetro é o tamanho da tela.
+    #Tamanho do monitor atual.
+    tam_monitor = pygame.display.Info()
+
+    x_monitor = tam_monitor.current_w
+    y_monitor = tam_monitor.current_h
+
+    fator_escala_x = x_monitor / 1920
+    fator_escala_y = y_monitor / 1080
+
+    # Aplica o fator de escala à resolução desejada
+    scaled_width = int(cfg.tam_tela_x * fator_escala_x)
+    scaled_height = int(cfg.tam_tela_y * fator_escala_y)
+
+    print(scaled_width, scaled_height)
+
+    # Cria a janela com o tamanho ajustado
+    tela = pygame.display.set_mode((scaled_width, scaled_height))
+
     pygame.display.set_caption(cfg.str_janela_menu) #Define título do menu.
 
     return tela
