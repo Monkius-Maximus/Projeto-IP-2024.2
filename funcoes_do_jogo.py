@@ -94,8 +94,8 @@ def eventos_menu(evento, jogar_rect, dict_icons, info_peças = {}):
 
     return tela_atual, info_peças
 
-#Função para lidar com os eventos da tela de xadrez. Ela recebe o evento que ocorreu, e também uma variável que armazena se já há uma casa selecionada.
-def eventos_xadrez(evento, casa_origem):
+#Função para lidar com os eventos da tela de xadrez. Ela recebe o evento que ocorreu, uma variável que armazena se já há uma casa clicada e outra variável armazenando de quem é a vez no jogo.
+def eventos_xadrez(evento, casa_origem, info_peças, vez):
 
     #Quando se verifica um evento da tela xadrez, a tela atual é o xadrez. Mas, poderá mudar, caso o usuário tenha decidido mudar de tela. Exemplo: voltando para o menu.
     tela_atual = 'xadrez'
@@ -159,27 +159,62 @@ def eventos_xadrez(evento, casa_origem):
 
             return resposta
 
+        #Função para lidar com cliques do mouse na barra lateral do jogo.
+        def cliques_barra_lateral(evento):
+            pass
+        
+        #Função para descobrir a casa de origem deve ser atualizada. Para isso, é necessário três coisas. Primeiro, que seja uma peça. Segundo, que seja uma peça branca na vez das brancas, e uma peça preta na vez das pretas. Terceiro, que a casa clicada seja diferente da casa de origem atual.
+        def atualizar_origem(casa_clicada, info_peças, vez):
+            
+            #Função para verificar se a casa clicada é a casa de uma peça. Também verifica se a peça clicada é uma peça de origem válida, ou seja, uma peça do jogador atual.
+            def é_peça_origem():
+
+                #A booleana começa com False, e, se acharmos uma peça nesta casa, se torna verdadeiro.
+                é_peça_origem = False
+
+                #Para cada grupo de cor de peças.
+                for grupo_cor in info_peças:
+                    
+                    #Para cada peça no grupo de cor.
+                    for peça in grupo_cor:
+
+                        #Booleana que verifica se esta peça está na casa clicada.
+                        é_peça = peça.casa == casa_clicada
+
+                        if é_peça:
+
+                            #Booleana que verifica se a peça é uma peça de origem, isto é, se é uma peça do jogador atual.
+                            é_origem = (vez == 0 and (peça.cor == 'preta' or peça.cor == 'preto') or vez == 1 and (peça.cor == 'branca' or peça.cor == 'branco'))
+
+                            #Se a casa clicada for idêntica à casa desta peça, e esta peça for uma peça do jogador atual.
+                            if é_origem:
+                                
+                                #Então há uma peça na casa clicada.
+                                é_peça_origem = True
+                
+                return é_peça_origem
+
         casa_clicada = encontrando_linha_coluna(pos_x, pos_y)
 
-        #Se não há casa anterior selecionada.
-        if casa_origem == ():
-            
-            casa_origem = casa_clicada
+        #Se não houve casa clicada, ou seja, se o clique do usuário foi na barra lateral do jogo.
+        if casa_clicada == False:
 
-        #Se houve uma casa anteriormente selecionada.
+            cliques_barra_lateral(evento)
+
+        #Se alguma casa foi clicada.
         else:
+
+            casa_origem, foi_atualizada = atualizar_origem(casa_clicada, info_peças, vez)
             
-            casa_destino = casa_clicada
+            print(f'{casa_origem} /// {casa_destino}')
+            
+            #Se já há uma casa de origem e uma casa de destino, limpa-se ambas para receber a próxima casa de origem e destino.
+            if casa_origem != () and casa_destino != ():
 
-        print(f'{casa_origem} /// {casa_destino}')
-        
-        #Se já há uma casa de origem e uma casa de destino, limpa-se ambas para receber a próxima casa de origem e destino.
-        if casa_origem != () and casa_destino != ():
+                casa_origem = ()
+                casa_destino = ()
 
-            casa_origem = ()
-            casa_destino = ()
-
-    return tela_atual, casa_origem
+    return tela_atual, casa_origem, info_peças, vez
 
 #Função para fazer os desenhos da tela menu.
 def desenhar_menu(tela, jogar, txt_menu, txt_menu_rect):
