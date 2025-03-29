@@ -1,6 +1,3 @@
-#Variável que define o funcionamento do aplicativo.
-usr_jogando = True
-
 #FPS do programa
 FPS = 60
 
@@ -47,16 +44,4 @@ tabuleiro_inicial = {
     'rainha_branca' : [(0, 3)],
     'rei_branco' : [(0, 4)],
     'peao_branco' : [(1, 0), (1, 1), (1, 2), (1, 3), (1, 4), (1, 5), (1, 6), (1, 7)]
-}
-
-#Um dicionário de mapeia os índices das colunas às colunas do xadrez.
-dict_colunas = {
-    0:'a',
-    1:'b',
-    2:'c',
-    3:'d',
-    4:'e',
-    5:'f',
-    6:'g',
-    7:'h',
 }
