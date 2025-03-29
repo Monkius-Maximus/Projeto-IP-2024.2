@@ -1,40 +1,37 @@
 import pygame
-import funcoes_do_jogo as fj
 from base_peça import Base
 
-class Torre(Base):
-    tipo = 'torre'
+class Bispo(Base):
+    
+    tipo = 'bispo'
 
-    def definir_lances_torre(self, info_peças):
+    def definir_lances_bispo(self, info_peças):
         """
-        Define os lances possíveis da torre com base na posição atual e nas posições de outras peças no tabuleiro.
-        
-        :param info_peças: Dicionário contendo informações sobre todas as peças no tabuleiro.
-        :return: Lista de lances possíveis (tuplas de coordenadas).
+        Retorna uma lista de coordenadas dos lances possíveis para o bispo
         """
-        # Lista para armazenar os lances possíveis
         lances_possíveis = []
         
-        # Obtém a posição atual da torre
+        # Obtém a posição atual do bispo
         linha_atual, coluna_atual = self.casa
         
-        # Direções em que a torre pode se mover: horizontal e vertical
+        # Direções diagonais em que o bispo pode se mover
         direções = [
-            (-1, 0),  # Cima
-            (1, 0),   # Baixo
-            (0, -1),  # Esquerda
-            (0, 1)    # Direita
+            (-1, -1),  # Diagonal cima-esquerda
+            (-1, 1),   # Diagonal cima-direita
+            (1, -1),   # Diagonal baixo-esquerda
+            (1, 1)     # Diagonal baixo-direita
         ]
         
         # Para cada direção...
         for dir_linha, dir_coluna in direções:
-            # Verificamos até onde a torre pode andar nesta direção
+            # Verificamos até onde o bispo pode andar nesta direção
             for i in range(1, 8):  # No máximo 7 casas em cada direção
                 nova_linha = linha_atual + i * dir_linha
                 nova_coluna = coluna_atual + i * dir_coluna
                 
                 # Verificar se a nova posição está dentro do tabuleiro
                 if 0 <= nova_linha <= 7 and 0 <= nova_coluna <= 7:
+                    # Verificar se há alguma peça na nova posição
                     casa_bloqueada = False
                     peça_capturável = False
                     
@@ -60,20 +57,12 @@ class Torre(Base):
                 else:
                     # Se saiu do tabuleiro, para de buscar nessa direção
                     break
-
-        return lances_possíveis
-
-    def destacar_lances_possíveis(self, tela, info_peças, tam_tabuleiro):
-        """
-        Destaca os lances possíveis da torre no tabuleiro, desenhando círculos verdes ao redor das casas possíveis.
         
-        :param tela: Tela onde o jogo está sendo desenhado.
-        :param info_peças: Dicionário contendo informações sobre todas as peças no tabuleiro.
-        :param tam_tabuleiro: Tamanho do tabuleiro para calcular a posição das casas.
-        :return: Lista de lances possíveis da torre.
-        """
+        return lances_possíveis
+        
+    def destacar_lances_possíveis(self, tela, info_peças, tam_tabuleiro):
         # Obtém os lances possíveis
-        lances = self.definir_lances_torre(info_peças)
+        lances = self.definir_lances_bispo(info_peças)
         
         # Para cada lance possível, desenha um círculo
         for lance in lances:
@@ -86,5 +75,3 @@ class Torre(Base):
             
             # Desenhar círculo semi-transparente
             pygame.draw.circle(tela, (0, 255, 0, 128), (x_centro, y_centro), tam_casa / 4)
-
-        return lances

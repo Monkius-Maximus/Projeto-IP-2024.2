@@ -266,10 +266,93 @@ def eventos_xadrez(tam_tabuleiro, evento, casa_origem, info_peças, vez):
             #Se não foi escolhida uma nova casa de origem neste clique, e, além disso, a casa de origem não está vazia, então significa que houve a tentativa de uma casa de destino.
                         
             #Se já há uma casa de origem e uma casa de destino, limpa-se ambas para receber a próxima casa de origem e destino.
-            if casa_origem != () and casa_destino != ():
-
+            # Se já existe uma casa de origem selecionada e uma nova casa foi clicada
+        if casa_origem != () and not foi_atualizada and casa_clicada:
+            casa_destino = casa_clicada
+    
+            # Função para verificar se o lance é válido
+            def é_lance_válido(casa_origem, casa_destino, info_peças):
+                # A booleana começa como False
+                é_válido = False
+                peça_origem = None
+        
+                # Buscar a peça que está na casa de origem
+                for grupo_cor in info_peças:
+                    for peça in info_peças[grupo_cor]:
+                        if peça.casa == casa_origem:
+                            peça_origem = peça
+                            break
+                    if peça_origem:
+                        break
+        
+                # Se encontrou uma peça na casa de origem
+                if peça_origem:
+                    # Se a peça for uma torre, usa sua função específica
+                    if peça_origem.tipo == 'torre':
+                        lances_possíveis = peça_origem.definir_lances_torre(info_peças)
+                        if casa_destino in lances_possíveis:
+                            é_válido = True
+        
+                return é_válido, peça_origem
+    
+            # Verificar se o lance é válido
+            é_válido, peça_origem = é_lance_válido(casa_origem, casa_destino, info_peças)
+    
+            # Se o lance for válido, move a peça
+            # Se o lance for válido, move a peça
+            if é_válido:
+                # Verificar se há alguma peça na casa de destino para capturar
+                peça_capturada = None
+                for grupo_cor in info_peças:
+                    for i, peça in enumerate(info_peças[grupo_cor]):
+                        if peça.casa == casa_destino:
+                            # Armazena a peça capturada
+                            peça_capturada = peça
+                            # Remove a peça capturada
+                            info_peças[grupo_cor].pop(i)
+                            break
+                    if peça_capturada:
+                        break
+                
+                # Registrar que o peão fez seu primeiro movimento
+                if peça_origem.tipo == 'peao' and peça_origem.primeiro_movimento:
+                    peça_origem.primeiro_movimento = False
+                
+                # Registrar que o rei ou a torre foram movidos (para controle do roque)
+                if peça_origem.tipo in ['rei', 'torre']:
+                    peça_origem.movido = True
+                
+                # Movendo a peça da casa de origem para a casa de destino
+                peça_origem.casa = casa_destino
+                peça_origem.pos = peça_origem.descobrir_pos(casa_destino, tam_tabuleiro)
+                
+                # Verificar promoção de peão (se um peão chegar à última linha)
+                if peça_origem.tipo == 'peao':
+                    última_linha = 0 if peça_origem.cor in ['preta', 'preto'] else 7
+                    if peça_origem.casa[0] == última_linha:
+                        # Promover o peão para rainha (simplificação)
+                        from rainha import Rainha
+                        grupo = 'pretas' if peça_origem.cor in ['preta', 'preto'] else 'brancas'
+                        # Remover o peão
+                        for i, peça in enumerate(info_peças[grupo]):
+                            if peça == peça_origem:
+                                info_peças[grupo].pop(i)
+                                break
+                        # Adicionar uma rainha no lugar
+                        nova_rainha = Rainha(peça_origem.cor, casa_destino, tam_tabuleiro)
+                        tipo_rainha = 'rainha_preta' if peça_origem.cor in ['preta', 'preto'] else 'rainha_branca'
+                        nova_rainha.criar_imagem(dict_icons[tipo_rainha])
+                        info_peças[grupo].append(nova_rainha)
+                
+                # Alternar o turno após um movimento válido
+                vez = 1 - vez  # Alterna entre 0 e 1
+                
+                # Limpar casa de origem e destino após o movimento
                 casa_origem = ()
                 casa_destino = ()
+            else:
+                # Se o lance não for válido, apenas limpa a casa de origem
+                casa_origem = ()
 
     return tela_atual, casa_origem, info_peças, vez
 
@@ -288,64 +371,103 @@ def desenhar_menu(tela, jogar, pos_jogar, txt_menu, pos_txt_menu):
     tela.blit(txt_menu, pos_txt_menu)
 
 #Função para fazer os desenhos da tela do xadrez.
-def desenhar_xadrez(tela, tabuleiro, info_peças):
-
-    #Pinta-se o fundo da tela de roxo, eliminando objetos antigos.
+def desenhar_xadrez(tela, tabuleiro, info_peças, casa_origem=None, vez=None):
+    # Pinta-se o fundo da tela de roxo, eliminando objetos antigos.
     tela.fill('purple')
-
-    #Desenha-se as coisas na tela.
-
-    #Desenha-se o tabuleiro.
+    
+    # Desenha-se o tabuleiro.
     tela.blit(tabuleiro, (0, 0))
+    
+    # Se há uma casa de origem selecionada, destaca ela
+    if casa_origem:
+        tam_casa = tabuleiro.get_size()[0] / 8
+        linha, coluna = casa_origem
+        # Converter coordenadas do tabuleiro para coordenadas da tela
+        x = coluna * tam_casa
+        y = tabuleiro.get_size()[0] - (linha + 1) * tam_casa
+        # Desenhar retângulo de destaque
+        pygame.draw.rect(tela, (255, 255, 0, 128), (x, y, tam_casa, tam_casa), 3)
+    
+    # Desenhar indicador de turno
+    fonte = pygame.font.SysFont('Arial', 20)
+    cor_turno = "Brancas" if vez == 1 else "Pretas"
+    texto_turno = fonte.render(f"Turno: {cor_turno}", True, (255, 255, 255))
+    tela.blit(texto_turno, (tabuleiro.get_size()[0] + 10, 30))
 
-    #Desenham-se as peças em cima do tabuleiro.
-    desenhar_peças(tela, info_peças)
+    # Desenhar mensagem, se houver
+    if mensagem:
+        texto_mensagem = fonte.render(mensagem, True, (255, 255, 0))
+        tela.blit(texto_mensagem, (tabuleiro.get_size()[0] + 10, 60))
+    
+    # Desenham-se as peças em cima do tabuleiro.
+    desenhar_peças(tela, info_peças, casa_origem)
 
 #Função que define as informações iniciais sobre as peças em cada casa. O dicionário é passado porque, para cada peça, é necessário saber qual é o png associado a ela de acordo com seu tipo.
 def definir_peças(dict_icons, tam_tabuleiro):
-
-    #Dicionário que irá armazenar informações sobre as peças (objetos das classes). 
+    # Importando as classes das peças
+    from torre import Torre
+    from cavalo import Cavalo
+    from bispo import Bispo
+    from rainha import Rainha
+    from rei import Rei
+    from peao import Peao
+    
+    # Dicionário que irá armazenar informações sobre as peças (objetos das classes). 
     info_peças = {
         'pretas' : [],
         'brancas' : []
     }
 
-    #Dicionário que mapeia a cor da peça individual ('preto', 'preta', 'branco', 'branca') para a string que representa o grupo a que pertence 'pretas' ou 'brancas'.
+    # Dicionário que mapeia a cor da peça individual para o grupo
     cor_info = {
-        'preta' : 'pretas',
-        'preto' : 'pretas',
-
-        'branca' : 'brancas',
-        'branco' : 'brancas'
+        'preta': 'pretas', 'preto': 'pretas',
+        'branca': 'brancas', 'branco': 'brancas'
     }
 
-    #Para cada tipo de peça, também haverá uma lista com as casas iniciais que as peças desse tipo irão ocupar.
+    # Para cada tipo de peça, criar instâncias
     for tipo_peça, casas_iniciais in cfg.tabuleiro_inicial.items():
-
-        #O tipo de peça é definido pela peça e por sua cor. Exemplo: torre_preta.
         peça = tipo_peça.split('_')[0]
         cor = tipo_peça.split('_')[1]
-
-        #Criando as torres do tabuleiro inicial.
-        if peça == 'torre':
+        grupo = cor_info[cor]
+        
+        for casa in casas_iniciais:
+            if peça == 'torre':
+                nova_peça = Torre(cor, casa, tam_tabuleiro)
+            elif peça == 'cavalo':
+                nova_peça = Cavalo(cor, casa, tam_tabuleiro)
+            elif peça == 'bispo':
+                nova_peça = Bispo(cor, casa, tam_tabuleiro)
+            elif peça == 'rainha':
+                nova_peça = Rainha(cor, casa, tam_tabuleiro)
+            elif peça == 'rei':
+                nova_peça = Rei(cor, casa, tam_tabuleiro)
+            elif peça == 'peao':
+                nova_peça = Peao(cor, casa, tam_tabuleiro)
             
-            for casa in casas_iniciais:
-                    
-                torre = Torre(cor, casa, tam_tabuleiro) #Cria o objeto da torre.
-                torre.criar_imagem(dict_icons[tipo_peça]) #Cria a sua imagem desenhável de acordo com seu tipo e cor.
-                grupo = cor_info[cor] #Associa ela ao grupo que pertence conforme sua cor.
-                info_peças[grupo].append(torre) #Adiciona ela no dicionário de todas as peças de acordo com seu grupo de cor.
+            nova_peça.criar_imagem(dict_icons[tipo_peça])
+            info_peças[grupo].append(nova_peça)
 
     return info_peças
 
-#Função para desenhar todas as peças no tabuleiro.
-def desenhar_peças(tela, info_peças):
-
-    #Queremos desenhar as peças de todas as cores, sejam elas pretas ou brancas.
+def desenhar_peças(tela, info_peças, casa_origem=None):
+    # Queremos desenhar as peças de todas as cores, sejam elas pretas ou brancas.
     for grupo_cor in info_peças:
-
-        #Para cada peça de cada grupo.
+        # Para cada peça de cada grupo.
         for peça in info_peças[grupo_cor]:
-
-            #Desenha a peça na tela.
+            # Desenha a peça na tela.
             peça.desenhar(tela)
+            
+            # Se esta peça está na casa de origem, destaca seus lances possíveis
+            if casa_origem and peça.casa == casa_origem:
+                if peça.tipo == 'torre':
+                    peça.destacar_lances_possíveis(tela, info_peças, 800)
+                elif peça.tipo == 'cavalo':
+                    peça.destacar_lances_possíveis(tela, info_peças, 800)
+                elif peça.tipo == 'bispo':
+                    peça.destacar_lances_possíveis(tela, info_peças, 800)
+                elif peça.tipo == 'rainha':
+                    peça.destacar_lances_possíveis(tela, info_peças, 800)
+                elif peça.tipo == 'rei':
+                    peça.destacar_lances_possíveis(tela, info_peças, 800)
+                elif peça.tipo == 'peao':
+                    peça.destacar_lances_possíveis(tela, info_peças, 800)

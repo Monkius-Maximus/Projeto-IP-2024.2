@@ -128,7 +128,7 @@ while usr_jogando:
     elif tela_atual == 'xadrez':
 
         #Desenha-se a tela do xadrez com as peças e todo o resto.
-        fj.desenhar_xadrez(tela, tabuleiro, info_peças)
+        fj.desenhar_xadrez(tela, tabuleiro, info_peças, casa_origem, vez)
 
     #Atualiza a tela desde as últimas alterações.
     pygame.display.update()
