@@ -9,6 +9,8 @@ os.system('clear')
 #Inicializa os módulos do Pygame.
 pygame.init()
 
+#Sobre o menu.
+
 #Variável armazenando a tela atual do jogo. Começa com menu.
 tela_atual = 'menu'
 
@@ -34,6 +36,8 @@ txt_jogar, txt_jogar_rect = fj._init_txt_jogar(jogar)
 
 #Colocando o texto 'Jogar' na superfície do botão Jogar.
 jogar.blit(txt_jogar, txt_jogar_rect) #Desenha o texto 'Jogar' no botão Jogar.
+
+#Sobre a tela do xadrez.
 
 # Importando as peças do xadrez.
 torre_preta = fj.importar_peças('torre_preta.png')
@@ -74,6 +78,9 @@ tabuleiro = pygame.image.load('imagens/tabuleiro.png')
 casa_origem = ()
 casa_destino = ()
 
+#Variável armazenando de quem é a vez no jogo. 0 -> pretas; 1 -> brancas.
+vez = 1
+
 #Loop principal do jogo.
 while usr_jogando:
 
@@ -105,7 +112,7 @@ while usr_jogando:
         elif tela_atual == 'xadrez':
 
             #Eventos da tela do xadrez são resolvidos e a tela atual é atualizada. A casa de destino não é enviada como parâmetro, pois, ela sempre será vazia ao checar novos eventos.
-            tela_atual, casa_origem = fj.eventos_xadrez(evento, casa_origem)
+            tela_atual, casa_origem, info_peças, vez = fj.eventos_xadrez(evento, casa_origem, info_peças, vez)
 
     #Desenhando as coisas no aplicativo de acordo com a tela do menu.
     if tela_atual == 'menu':
