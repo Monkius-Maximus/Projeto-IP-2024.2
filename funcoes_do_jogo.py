@@ -90,6 +90,86 @@ def _init_txt_jogar(jogar):
 
     return txt_jogar, pos_txt_jogar
 
+#Função para inicializar as peças brancas capturadas da sidebar.
+def _init_brancas_capturadas(torre_branca_pequena,
+                            cavalo_branco_pequeno,
+                            bispo_branco_pequeno,
+                            rainha_branca_pequena,
+                            peão_branco_pequeno,
+                            tam_tabuleiro):
+
+    #Definindo posições.
+
+    x_geral = tam_tabuleiro + 20
+
+    y_peão_branco = 10
+    y_cavalo_branco = y_peão_branco + cfg.tam_peça_sidebar + 10
+    y_bispo_branco = y_cavalo_branco + cfg.tam_peça_sidebar + 10
+    y_torre_branca = y_bispo_branco + cfg.tam_peça_sidebar + 10
+    y_rainha_branca = y_torre_branca + cfg.tam_peça_sidebar + 10
+
+    #Associando as posições aos ícones.
+
+    brancas_capturadas = {
+        'peão_branco': (peão_branco_pequeno, (x_geral, y_peão_branco)),
+        'cavalo_branco': (cavalo_branco_pequeno, (x_geral, y_cavalo_branco)),
+        'bispo_branco': (bispo_branco_pequeno, (x_geral, y_bispo_branco)),
+        'torre_branca': (torre_branca_pequena, (x_geral, y_torre_branca)),
+        'rainha_branca': (rainha_branca_pequena, (x_geral, y_rainha_branca)),
+    }
+
+    return brancas_capturadas
+
+#Função para inicializar os textos das peças na sidebar. Pode ser usado para brancas ou pretas.
+def _init_textos(peças_capturadas):
+    
+    textos = {}
+
+    for peça, (icon, (x, y)) in peças_capturadas.items():
+
+        #Definindo fonte.
+        fonte_título = pygame.font.SysFont(cfg.str_fonte_sidebar, cfg.tam_fonte_sidebar)
+
+        #Renderiza o texto em uma superfície. Define-se: string do título, anti-aliasing e cor do título.
+        antialais = True
+        txt_sidebar = fonte_título.render(' -> 0', antialais, cfg.cor_txt_sidebar)
+
+        pos_txt_sidebar = (x + cfg.tam_peça_sidebar + 5, y)
+
+        textos[peça] = (txt_sidebar, pos_txt_sidebar)
+    
+    return textos
+
+#Função para inicializar as peças pretas capturadas na sidebar.
+def _init_pretas_capturadas(torre_preta_pequena,
+                            cavalo_preto_pequeno,
+                            bispo_preto_pequeno,
+                            rainha_preta_pequena,
+                            peão_preto_pequeno,
+                            tam_tabuleiro):
+    
+    #Definindo posições.
+
+    x_geral = tam_tabuleiro + 20
+
+    y_rainha_preta = tam_tabuleiro - cfg.tam_peça_sidebar - 10
+    y_torre_preta = y_rainha_preta - cfg.tam_peça_sidebar - 10
+    y_bispo_preto = y_torre_preta - cfg.tam_peça_sidebar - 10
+    y_cavalo_preto = y_bispo_preto - cfg.tam_peça_sidebar - 10
+    y_peão_preto = y_cavalo_preto - cfg.tam_peça_sidebar - 10
+
+    #Associando as posições aos ícones.
+
+    pretas_capturadas = {
+        'peao_preto': (peão_preto_pequeno, (x_geral, y_peão_preto)),
+        'cavalo_preto': (cavalo_preto_pequeno, (x_geral, y_cavalo_preto)),
+        'bispo_preto': (bispo_preto_pequeno, (x_geral, y_bispo_preto)),
+        'torre_preta': (torre_preta_pequena, (x_geral, y_torre_preta)),
+        'rainha_preta': (rainha_preta_pequena, (x_geral, y_rainha_preta)),
+    }
+
+    return pretas_capturadas
+
 #Função para importar e redimensionar o tabuleiro do xadrez.
 def importar_tabuleiro(tela_x):
 
@@ -113,8 +193,11 @@ def importar_peças(peça_png, tabuleiro):
     tam_peça_redim = (cfg.tam_peça * tam_real_casa) / cfg.tam_casa
 
     peça = pygame.transform.scale(peça, (tam_peça_redim, tam_peça_redim))
+    
+    #Cria uma versão menor da peça para ser usada na sidebar.
+    peça_pequena = pygame.transform.scale(peça, (cfg.tam_peça_sidebar, cfg.tam_peça_sidebar))
 
-    return peça
+    return peça, peça_pequena
 
 #Função para lidar com os eventos do menu. Info_peças começa sendo um dicionário vazio, pois ainda estamos no menu e o usuário ainda não escolheu jogar.
 def eventos_menu(evento, jogar_rect, dict_icons, tam_tabuleiro, info_peças = {}):
@@ -205,7 +288,7 @@ def eventos_xadrez(tam_tabuleiro, evento, casa_origem, info_peças, vez):
         def cliques_barra_lateral(evento):
             pass
         
-        #Função para descobrir se a casa de origem deve ser atualizada. Para isso, é necessário três coisas. Primeiro, que seja uma peça. Segundo, que seja uma peça branca na vez das brancas, e uma peça preta na vez das pretas.
+        #Função para descobrir se a casa de origem deve ser atualizada. Para isso, são necessárias duas coisas. Primeiro, que a casa clicada seja uma peça. Segundo, que seja uma peça branca na vez das brancas, e uma peça preta na vez das pretas. Terceiro, que seja uma peça distinta da peça atualmente selecionada (caso haja alguma).
         def atualizar_origem(casa_origem, casa_clicada, info_peças, vez):
 
             #Se a casa de origem for atualizada no meio da função, essa variável será atualizada para True.
@@ -229,7 +312,7 @@ def eventos_xadrez(tam_tabuleiro, evento, casa_origem, info_peças, vez):
                         if é_peça:
 
                             #Booleana que verifica se a peça é uma peça de origem, isto é, se é uma peça do jogador atual.
-                            é_origem = (vez == 0 and (peça.cor == 'preta' or peça.cor == 'preto') or vez == 1 and (peça.cor == 'branca' or peça.cor == 'branco'))
+                            é_origem = (vez == 'pretas' and (peça.cor == 'preta' or peça.cor == 'preto') or vez == 'brancas' and (peça.cor == 'branca' or peça.cor == 'branco'))
 
                             #Se a casa clicada for idêntica à casa desta peça, e esta peça for uma peça do jogador atual.
                             if é_origem:
@@ -249,8 +332,53 @@ def eventos_xadrez(tam_tabuleiro, evento, casa_origem, info_peças, vez):
 
             return casa_origem, foi_atualizada
 
+        #Função para descobrir se a casa de destino deve ser atualizada. Para isso, são necessárias duas coisas. Primeiro, uma casa de origem válida, que é uma peça do usuário já selecinada. Segundo, que ele tenha selecionado, no clique da casa de destino, um lugar para o qual a peça dele pode, efetivamente, ir. Esta função supõe a primeira condição e verifica a segunda.
+        def atualizar_destino(casa_origem, casa_clicada, info_peças, vez, tam_tabuleiro):
+
+            #Função para encontrar a peça atualmente selecionada.
+            def encontrar_peça_selecionada(casa_origem, info_peças, vez):
+                
+                peça_selecionada = None
+
+                #Para cada peça na lista das peças do grupo de cor da peça selecionada. Ex.: Na vez das brancas, para cada peça branca.    
+                for peça in info_peças[vez]:
+                    
+                    #Se a peça estiver na casa clicada de origem.
+                    if peça.casa == casa_origem:
+                        
+                        #Achou-se a peça selecionada
+                        peça_selecionada = peça
+
+                return peça_selecionada
+
+            #Encontrando a peça atualmente selecionada.
+            peça_selecionada = encontrar_peça_selecionada(casa_origem, info_peças, vez)
+
+            #Se ela pode ir para onde o usuário clicou.
+            if casa_clicada in peça_selecionada.movimentos_possíveis(info_peças):
+                
+                #Move a peça.
+                peça_selecionada.mover_peça(casa_clicada, info_peças, tam_tabuleiro)
+                
+                #Checa se alguma peça do time oposto foi capturada e deleta ela com base nisso.
+                grupo_cor_oposta = 'pretas' if vez == 'brancas' else 'brancas'
+
+                for peça_oposta in info_peças[grupo_cor_oposta]:
+                    
+                    #Se há uma peça da cor oposta na casa para a qual a peça foi.
+                    if peça_oposta.casa == casa_clicada:
+                        
+                        #Remove a peça oposta, pois ela foi capturada.
+                        info_peças[grupo_cor_oposta].remove(peça_oposta)
+
+                        #Atualiza a sidebar passando como parâmetro o tipo da peça oposta, e sua cor.
+
+                #Troca a vez do jogador.
+                vez = 'pretas' if vez == 'brancas' else 'brancas'
+
+            return vez
+
         casa_clicada = encontrando_linha_coluna(tam_tabuleiro, pos_x, pos_y)
-        print(casa_clicada)
 
         #Se não houve casa clicada, ou seja, se o clique do usuário foi na barra lateral do jogo.
         if casa_clicada == False:
@@ -263,13 +391,14 @@ def eventos_xadrez(tam_tabuleiro, evento, casa_origem, info_peças, vez):
             #Atualizando a casa de origem, se isso for necessário.
             casa_origem, foi_atualizada = atualizar_origem(casa_origem, casa_clicada, info_peças, vez)
 
-            #Se não foi escolhida uma nova casa de origem neste clique, e, além disso, a casa de origem não está vazia, então significa que houve a tentativa de uma casa de destino.
-                        
-            #Se já há uma casa de origem e uma casa de destino, limpa-se ambas para receber a próxima casa de origem e destino.
-            if casa_origem != () and casa_destino != ():
-
+            #Se não foi escolhida uma nova casa de origem neste clique, e, além disso, a casa de origem não está atualmente vazia, então isso significa que houve a tentativa de uma casa de destino.
+            if not(foi_atualizada) and casa_origem != ():
+                
+                #Atualizando a casa de destino, se isso for necessário. Se uma casa de destino válida foi selecionada, então a peça será movida.
+                vez = atualizar_destino(casa_origem, casa_clicada, info_peças, vez, tam_tabuleiro)
+            
+                #Seja a peça movida (tentativa válida) ou não (tentativa inválida), a casa de origem é zerada para uma nova seleção.
                 casa_origem = ()
-                casa_destino = ()
 
     return tela_atual, casa_origem, info_peças, vez
 
@@ -291,7 +420,7 @@ def desenhar_menu(tela, jogar, pos_jogar, txt_menu, pos_txt_menu):
 def desenhar_xadrez(tela, tabuleiro, info_peças):
 
     #Pinta-se o fundo da tela de roxo, eliminando objetos antigos.
-    tela.fill('purple')
+    tela.fill('blue')
 
     #Desenha-se as coisas na tela.
 
@@ -301,6 +430,20 @@ def desenhar_xadrez(tela, tabuleiro, info_peças):
     #Desenham-se as peças em cima do tabuleiro.
     desenhar_peças(tela, info_peças)
 
+#Função para fazer os desenhos da sidebar da contagem de peças.
+def desenhar_sidebar_contagem(tela, sidebar_contagem):
+
+    #As chaves podem ser 'ícones' e 'textos', de forma que os ícones e os textos são ambos desenhados. Os subdicionários são as listas dos ícones e textos das brancas ou pretas na sidebar.
+    for chave, subdicionário in sidebar_contagem.items():
+        
+        for grupo_cor in subdicionário.keys():
+            
+            peças_cor = subdicionário[grupo_cor]
+
+            for peça, (icon, posição) in peças_cor.items():
+
+                tela.blit(icon, posição)
+    
 #Função que define as informações iniciais sobre as peças em cada casa. O dicionário é passado porque, para cada peça, é necessário saber qual é o png associado a ela de acordo com seu tipo.
 def definir_peças(dict_icons, tam_tabuleiro):
 
@@ -331,7 +474,7 @@ def definir_peças(dict_icons, tam_tabuleiro):
             
             for casa in casas_iniciais:
                     
-                torre = Torre(cor, casa, tam_tabuleiro) #Cria o objeto da torre.
+                torre = Torre(cor, casa, tam_tabuleiro, info_peças) #Cria o objeto da torre.
                 torre.criar_imagem(dict_icons[tipo_peça]) #Cria a sua imagem desenhável de acordo com seu tipo e cor.
                 grupo = cor_info[cor] #Associa ela ao grupo que pertence conforme sua cor.
                 info_peças[grupo].append(torre) #Adiciona ela no dicionário de todas as peças de acordo com seu grupo de cor.
