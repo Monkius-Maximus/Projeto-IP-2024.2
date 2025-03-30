@@ -52,3 +52,10 @@ tabuleiro_inicial = {
     'rei_branco' : [(0, 4)],
     'peao_branco' : [(1, 0), (1, 1), (1, 2), (1, 3), (1, 4), (1, 5), (1, 6), (1, 7)]
 }
+
+#Sobre a sidebar.
+
+tam_peça_sidebar = 45 #Tamanho de cada peça na sidebar.
+tam_fonte_sidebar = 48 #Tamanho dos textos de cada peça na sidebar.
+str_fonte_sidebar = 'Ubuntu'
+cor_txt_sidebar = (0, 0, 0)
