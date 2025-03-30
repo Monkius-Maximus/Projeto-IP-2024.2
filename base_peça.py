@@ -6,8 +6,8 @@ class Base:
     O formato do input deve ser assim:
 
     cor = 'branca' ou 'preta'
-    casa = (0, 0); (0, 1), etc."""    
-    def __init__(self, cor, casa, tam_tabuleiro):
+    casa = (0, 0); (0, 1), etc."""
+    def __init__(self, cor, casa, tam_tabuleiro, info_peças):
 
         self.cor = cor
         self.casa = casa
@@ -18,11 +18,12 @@ class Base:
         #Define a posição a ser desenhada no tabuleiro, conforme a casa ocupada pela peça. Isso é uma função geral e não um método desta classe, pois tal função poderá ser usada também pelas classes de Peão, Cavalo, Bispo, etc.
         self.pos = self.descobrir_pos(casa, tam_tabuleiro)
 
-    #Move a peça pelo tabuleiro.
-    def mover_peça(self, nova_casa):
+    #Move a peça pelo tabuleiro e define as novas casas para as quais ela poderá ir na nova casa.
+    def mover_peça(self, nova_casa, info_peças, tam_tabuleiro):
 
+        #Atualiza a casa da peça e a posição conforme o tabuleiro.
         self.casa = nova_casa
-        self.pos = self.descobrir_pos(nova_casa)
+        self.pos = self.descobrir_pos(nova_casa, tam_tabuleiro)
 
     #Define o icon desenhável de cada peça.
     def definir_peça(self, dict_icons):
