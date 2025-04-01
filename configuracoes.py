@@ -55,7 +55,10 @@ tabuleiro_inicial = {
 
 #Sobre a sidebar.
 
+tam_sidebar = tam_tela_x - tam_tabuleiro #Tamanho inteiro da sidebar.
 tam_peça_sidebar = 45 #Tamanho de cada peça na sidebar.
 tam_fonte_sidebar = 48 #Tamanho dos textos de cada peça na sidebar.
 str_fonte_sidebar = 'Ubuntu'
 cor_txt_sidebar = (0, 0, 0)
+distancia_tabuleiro = 20 #Distância das peças com relação ao tabuleiro, segundo o eixo horizontal.
+distancia_peças = 10 #Distância das peças entre si, segundo o eixo vertical.
