@@ -96,17 +96,27 @@ def _init_brancas_capturadas(torre_branca_pequena,
                             bispo_branco_pequeno,
                             rainha_branca_pequena,
                             peão_branco_pequeno,
-                            tam_tabuleiro):
+                            tam_tabuleiro,
+                            tam_tela,
+                            y_peça_sidebar_redim):
 
     #Definindo posições.
 
-    x_geral = tam_tabuleiro + 20
+    #Redimensiona a distância das peças para o tabuleiro segundo o eixo horizontal, considerando o tamanho real x do tabuleiro e o tamanho real x da tela.
 
-    y_peão_branco = 10
-    y_cavalo_branco = y_peão_branco + cfg.tam_peça_sidebar + 10
-    y_bispo_branco = y_cavalo_branco + cfg.tam_peça_sidebar + 10
-    y_torre_branca = y_bispo_branco + cfg.tam_peça_sidebar + 10
-    y_rainha_branca = y_torre_branca + cfg.tam_peça_sidebar + 10
+    tam_side_bar_redim = tam_tela[0] - tam_tabuleiro
+    distancia_tabuleiro_real = (cfg.distancia_tabuleiro * tam_side_bar_redim) / cfg.tam_sidebar
+    x_geral = tam_tabuleiro + distancia_tabuleiro_real
+
+    #Redimensiona a distância das peças entre si segundo o eixo vertical, considerando o tamanho real da peça na sidebar.
+
+    distancia_peças_real = (cfg.distancia_peças * y_peça_sidebar_redim) / cfg.tam_peça_sidebar
+
+    y_peão_branco = distancia_peças_real
+    y_cavalo_branco = y_peão_branco + y_peça_sidebar_redim + distancia_peças_real
+    y_bispo_branco = y_cavalo_branco + y_peça_sidebar_redim + distancia_peças_real
+    y_torre_branca = y_bispo_branco + y_peça_sidebar_redim + distancia_peças_real
+    y_rainha_branca = y_torre_branca + y_peça_sidebar_redim + distancia_peças_real
 
     #Associando as posições aos ícones.
 
@@ -146,17 +156,27 @@ def _init_pretas_capturadas(torre_preta_pequena,
                             bispo_preto_pequeno,
                             rainha_preta_pequena,
                             peão_preto_pequeno,
-                            tam_tabuleiro):
+                            tam_tabuleiro,
+                            tam_tela,
+                            y_peça_sidebar_redim):
     
     #Definindo posições.
 
-    x_geral = tam_tabuleiro + 20
+    #Redimensiona a distância das peças para o tabuleiro segundo o eixo vertical, considerando o tamanho real do tabuleiro e o tamanho real da tela.
 
-    y_rainha_preta = tam_tabuleiro - cfg.tam_peça_sidebar - 10
-    y_torre_preta = y_rainha_preta - cfg.tam_peça_sidebar - 10
-    y_bispo_preto = y_torre_preta - cfg.tam_peça_sidebar - 10
-    y_cavalo_preto = y_bispo_preto - cfg.tam_peça_sidebar - 10
-    y_peão_preto = y_cavalo_preto - cfg.tam_peça_sidebar - 10
+    tam_side_bar_redim = tam_tela[0] - tam_tabuleiro
+    distancia_tabuleiro_real = (cfg.distancia_tabuleiro * tam_side_bar_redim) / cfg.tam_sidebar
+    x_geral = tam_tabuleiro + distancia_tabuleiro_real
+
+    #Redimensiona a distância das peças entre si segundo o eixo vertical, considerando o tamanho real da peça na sidebar.
+    
+    distancia_peças_real = (cfg.distancia_peças * y_peça_sidebar_redim) / cfg.tam_peça_sidebar
+
+    y_rainha_preta = tam_tabuleiro - y_peça_sidebar_redim - distancia_peças_real
+    y_torre_preta = y_rainha_preta - y_peça_sidebar_redim - distancia_peças_real
+    y_bispo_preto = y_torre_preta - y_peça_sidebar_redim - distancia_peças_real
+    y_cavalo_preto = y_bispo_preto - y_peça_sidebar_redim - distancia_peças_real
+    y_peão_preto = y_cavalo_preto - y_peça_sidebar_redim - distancia_peças_real
 
     #Associando as posições aos ícones.
 
@@ -194,8 +214,10 @@ def importar_peças(peça_png, tabuleiro):
 
     peça = pygame.transform.scale(peça, (tam_peça_redim, tam_peça_redim))
     
-    #Cria uma versão menor da peça para ser usada na sidebar.
-    peça_pequena = pygame.transform.scale(peça, (cfg.tam_peça_sidebar, cfg.tam_peça_sidebar))
+    #Cria uma versão menor da peça para ser usada na sidebar. Redimensiona seu tamanho com base no tamanho real da peça, conforme a resolução do monitor.
+    tam_peça_sidebar_redim = (cfg.tam_peça_sidebar * tam_peça_redim) / cfg.tam_peça
+
+    peça_pequena = pygame.transform.scale(peça, (tam_peça_sidebar_redim, tam_peça_sidebar_redim))
 
     return peça, peça_pequena
 
