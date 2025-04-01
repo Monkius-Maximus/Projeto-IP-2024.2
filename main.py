@@ -21,7 +21,7 @@ usr_jogando = True
 tela = fj._init_tela()
 
 #Salva os tamanhos x e y reais da tela, após ajustada para atender às proporções do monitor em questão.
-tela_x, tela_y = tela.get_size()
+tam_tela = tela_x, tela_y = tela.get_size()
 
 #Objeto para administrar o tempo do programa.
 relógio = pygame.time.Clock()
@@ -69,7 +69,9 @@ brancas_capturadas = fj._init_brancas_capturadas(torre_branca_pequena,
                                                  bispo_branco_pequeno,
                                                  rainha_branca_pequena,
                                                  peão_branco_pequeno,
-                                                 tam_tabuleiro)
+                                                 tam_tabuleiro,
+                                                 tam_tela,
+                                                 torre_preta_pequena.get_size()[1])
 
 #Inicializar os textos das brancas capturadas na sidebar, com base na posição das brancas capturadas.
 textos_brancas = fj._init_textos(brancas_capturadas)
@@ -80,7 +82,9 @@ pretas_capturadas = fj._init_pretas_capturadas(torre_preta_pequena,
                                                bispo_preto_pequeno,
                                                rainha_preta_pequena,
                                                peão_preto_pequeno,
-                                               tam_tabuleiro)
+                                               tam_tabuleiro,
+                                               tam_tela,
+                                               torre_preta_pequena.get_size()[1])
 
 #Inicializar os textos das brancas capturadas na sidebar, com base na posição das brancas capturadas.
 textos_pretas = fj._init_textos(pretas_capturadas)
