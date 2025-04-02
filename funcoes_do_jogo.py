@@ -1,7 +1,8 @@
 import pygame
 import configuracoes as cfg
 from torre import Torre
-from peao import Peao
+from peao import Peão
+import pprint
 
 #Função feita para inicializar a tela. É chamada no início do jogo para configurar o menu.
 def _init_tela():
@@ -143,11 +144,12 @@ def _init_textos(peças_capturadas):
 
         #Renderiza o texto em uma superfície. Define-se: string do título, anti-aliasing e cor do título.
         antialais = True
-        txt_sidebar = fonte_título.render(' -> 0', antialais, cfg.cor_txt_sidebar)
+        texto_atual = ' -> 0'
+        txt_sidebar = fonte_título.render(texto_atual, antialais, cfg.cor_txt_sidebar)
 
         pos_txt_sidebar = (x + cfg.tam_peça_sidebar + 5, y)
 
-        textos[peça] = (txt_sidebar, pos_txt_sidebar)
+        textos[peça] = [txt_sidebar, pos_txt_sidebar, texto_atual]
     
     return textos
 
@@ -182,7 +184,7 @@ def _init_pretas_capturadas(torre_preta_pequena,
     #Associando as posições aos ícones.
 
     pretas_capturadas = {
-        'peao_preto': (peão_preto_pequeno, (x_geral, y_peão_preto)),
+        'peão_preto': (peão_preto_pequeno, (x_geral, y_peão_preto)),
         'cavalo_preto': (cavalo_preto_pequeno, (x_geral, y_cavalo_preto)),
         'bispo_preto': (bispo_preto_pequeno, (x_geral, y_bispo_preto)),
         'torre_preta': (torre_preta_pequena, (x_geral, y_torre_preta)),
@@ -243,7 +245,7 @@ def eventos_menu(evento, jogar_rect, dict_icons, tam_tabuleiro, info_peças = {}
     return tela_atual, info_peças
 
 #Função para lidar com os eventos da tela de xadrez. Ela recebe o evento que ocorreu, uma variável que armazena se já há uma casa clicada e outra variável armazenando de quem é a vez no jogo.
-def eventos_xadrez(tam_tabuleiro, evento, casa_origem, info_peças, vez):
+def eventos_xadrez(tam_tabuleiro, evento, casa_origem, info_peças, vez, sidebar_contagem):
 
     #Quando se verifica um evento da tela xadrez, a tela atual é o xadrez. Mas, poderá mudar, caso o usuário tenha decidido mudar de tela. Exemplo: voltando para o menu.
     tela_atual = 'xadrez'
@@ -356,7 +358,7 @@ def eventos_xadrez(tam_tabuleiro, evento, casa_origem, info_peças, vez):
             return casa_origem, foi_atualizada
 
         #Função para descobrir se a casa de destino deve ser atualizada. Para isso, são necessárias duas coisas. Primeiro, uma casa de origem válida, que é uma peça do usuário já selecinada. Segundo, que ele tenha selecionado, no clique da casa de destino, um lugar para o qual a peça dele pode, efetivamente, ir. Esta função supõe a primeira condição e verifica a segunda.
-        def atualizar_destino(casa_origem, casa_clicada, info_peças, vez, tam_tabuleiro):
+        def atualizar_destino(casa_origem, casa_clicada, info_peças, vez, tam_tabuleiro, sidebar_contagem):
 
             #Função para encontrar a peça atualmente selecionada.
             def encontrar_peça_selecionada(casa_origem, info_peças, vez):
@@ -396,6 +398,25 @@ def eventos_xadrez(tam_tabuleiro, evento, casa_origem, info_peças, vez):
 
                         #Atualiza a sidebar passando como parâmetro o tipo da peça oposta, e sua cor.
 
+                        for tipo_peça, elementos_texto in sidebar_contagem['textos'][grupo_cor_oposta].items():
+
+                            if tipo_peça == peça_oposta.tipo + '_' + peça_oposta.cor:
+
+                                texto_atual = elementos_texto[2] #Texto atual que está sendo desenhado, que representa a quantidade de vezes que a peça foi capturada.
+                                num_atual = int(texto_atual.split(' -> ')[1]) #Pega só o número.
+                                num_atual += 1 #Soma em 1, pois uma peça desse tipo foi capturada.
+                                texto_atual = ' -> ' + str(num_atual) #Troca o texto atual.
+
+                                #Gera uma nova fonte e superfície com base no novo texto.
+                                fonte_título = pygame.font.SysFont(cfg.str_fonte_sidebar, cfg.tam_fonte_sidebar)
+                                txt_sidebar = fonte_título.render(texto_atual, True, cfg.cor_txt_sidebar)
+
+                                #Atualiza a superfície para comportar o texto com o novo valor de captura.
+                                sidebar_contagem['textos'][grupo_cor_oposta][tipo_peça][0] = txt_sidebar
+
+                                #Atualiza o texto com a quantidade de peças deste tipo capturadas.
+                                sidebar_contagem['textos'][grupo_cor_oposta][tipo_peça][2] = texto_atual
+
                 #Troca a vez do jogador.
                 vez = 'pretas' if vez == 'brancas' else 'brancas'
 
@@ -418,7 +439,7 @@ def eventos_xadrez(tam_tabuleiro, evento, casa_origem, info_peças, vez):
             if not(foi_atualizada) and casa_origem != ():
                 
                 #Atualizando a casa de destino, se isso for necessário. Se uma casa de destino válida foi selecionada, então a peça será movida.
-                vez = atualizar_destino(casa_origem, casa_clicada, info_peças, vez, tam_tabuleiro)
+                vez = atualizar_destino(casa_origem, casa_clicada, info_peças, vez, tam_tabuleiro, sidebar_contagem)
             
                 #Seja a peça movida (tentativa válida) ou não (tentativa inválida), a casa de origem é zerada para uma nova seleção.
                 casa_origem = ()
@@ -463,10 +484,18 @@ def desenhar_sidebar_contagem(tela, sidebar_contagem):
             
             peças_cor = subdicionário[grupo_cor]
 
-            for peça, (icon, posição) in peças_cor.items():
+            if chave == 'ícones':
 
-                tela.blit(icon, posição)
-    
+                for peça, (icon, posição) in peças_cor.items():
+
+                    tela.blit(icon, posição)
+
+            elif chave == 'textos':
+
+                for peça, (icon, posição, texto_atual) in peças_cor.items():
+
+                    tela.blit(icon, posição)
+
 #Função que define as informações iniciais sobre as peças em cada casa. O dicionário é passado porque, para cada peça, é necessário saber qual é o png associado a ela de acordo com seu tipo.
 def definir_peças(dict_icons, tam_tabuleiro):
 
@@ -502,11 +531,11 @@ def definir_peças(dict_icons, tam_tabuleiro):
                 grupo = cor_info[cor] #Associa ela ao grupo que pertence conforme sua cor.
                 info_peças[grupo].append(torre) #Adiciona ela no dicionário de todas as peças de acordo com seu grupo de cor.
 
-        elif peça == 'peao':
+        elif peça == 'peão':
 
             for casa in casas_iniciais:
                     
-                peão = Peao(cor, casa, tam_tabuleiro, info_peças) #Cria o objeto do peão.
+                peão = Peão(cor, casa, tam_tabuleiro, info_peças) #Cria o objeto do peão.
                 peão.criar_imagem(dict_icons[tipo_peça])
                 grupo = cor_info[cor]
                 info_peças[grupo].append(peão)
