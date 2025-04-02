@@ -2,7 +2,6 @@ import pygame
 import configuracoes as cfg
 from torre import Torre
 from peao import Peão
-import pprint
 
 #Função feita para inicializar a tela. É chamada no início do jogo para configurar o menu.
 def _init_tela():
