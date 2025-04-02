@@ -2,6 +2,7 @@ import pygame
 import configuracoes as cfg
 from torre import Torre
 from peao import Peão
+from rei import Rei
 
 #Função feita para inicializar a tela. É chamada no início do jogo para configurar o menu.
 def _init_tela():
@@ -538,6 +539,13 @@ def definir_peças(dict_icons, tam_tabuleiro):
                 peão.criar_imagem(dict_icons[tipo_peça])
                 grupo = cor_info[cor]
                 info_peças[grupo].append(peão)
+
+        elif peça == 'rei':
+            for casa in casas_iniciais:
+                rei = Rei(cor, casa, tam_tabuleiro, info_peças)  # Cria o objeto do rei.
+                rei.criar_imagem(dict_icons[tipo_peça])  # Cria a sua imagem desenhável de acordo com seu tipo e cor.
+                grupo = cor_info[cor]  # Associa ele ao grupo que pertence conforme sua cor.
+                info_peças[grupo].append(rei)  # Adiciona ele no dicionário de todas as peças de acordo com seu grupo de cor.
 
     return info_peças
 
