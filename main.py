@@ -2,7 +2,7 @@ import pygame, os
 import funcoes_do_jogo as fj
 import configuracoes as cfg
 from torre import Torre
-from peao import Peao
+from peao import Peão
 
 #Limpa o terminal para fazer impressões.
 os.system('clear')
@@ -110,14 +110,14 @@ dict_icons = {
     'bispo_preto' : bispo_preto,
     'rainha_preta' : rainha_preta,
     'rei_preto' : rei_preto,
-    'peao_preto' : peão_preto,
+    'peão_preto' : peão_preto,
 
     'torre_branca' : torre_branca,
     'cavalo_branco' : cavalo_branco,
     'bispo_branco' : bispo_branco,
     'rainha_branca' : rainha_branca,
     'rei_branco' : rei_branco,
-    'peao_branco' : peão_branco,
+    'peão_branco' : peão_branco,
 }
 
 #Casa de origem e de destino selecionadas. Ambas começam vazias. Ex.: Se o usuário clica na casa a7, e além disso ele havia clicado anteriormente na casa a1, onde há uma torre, a torre deve ser movida de a1 para a7.
@@ -158,7 +158,7 @@ while usr_jogando:
         elif tela_atual == 'xadrez':
 
             #Eventos da tela do xadrez são resolvidos e a tela atual é atualizada. A casa de destino não é enviada como parâmetro, pois, ela sempre será vazia ao checar novos eventos.
-            tela_atual, casa_origem, info_peças, vez = fj.eventos_xadrez(tam_tabuleiro, evento, casa_origem, info_peças, vez)
+            tela_atual, casa_origem, info_peças, vez = fj.eventos_xadrez(tam_tabuleiro, evento, casa_origem, info_peças, vez, sidebar_contagem)
 
     #Desenhando as coisas no aplicativo de acordo com a tela do menu.
     if tela_atual == 'menu':
