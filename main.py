@@ -3,6 +3,7 @@ import funcoes_do_jogo as fj
 import configuracoes as cfg
 from torre import Torre
 from peao import Peão
+from rei import Rei
 
 #Limpa o terminal para fazer impressões.
 os.system('clear')
