@@ -2,6 +2,7 @@ import pygame, os
 import funcoes_do_jogo as fj
 import configuracoes as cfg
 from torre import Torre
+from peao import Peao
 
 #Limpa o terminal para fazer impressões.
 os.system('clear')
