@@ -2,11 +2,8 @@ import pygame
 from base_peça import Base
 
 class Peão(Base):
-    """Um método construtor que define a casa ocupada pelo novo peão, assim como seu tipo e cor.
     
-    O formato do input deve ser assim:
-    cor = 'branca' ou 'preta'
-    casa = (0, 0); (0, 1), etc."""
+    #O método construtor é herdado da classe Base.
     
     tipo = 'peão'
     
