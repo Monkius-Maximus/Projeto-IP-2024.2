@@ -4,14 +4,10 @@ from base_peça import Base
 
 class Torre(Base):
 
-    """Um método construtor que define a casa ocupada pela nova torre, assim como seu tipo (caso tenha que ser consultada por alguma função externa) e cor (se é branca ou preta). 
-    
-        O formato do input deve ser assim:
-
-        cor = 'branca' ou 'preta'
-        casa = (0, 0); (0, 1), etc."""
+    #O método construtor é herdado da classe Base.
     
     tipo = 'torre'
+    movida = False
 
     #Uma função que retorna os lances possíveis a serem feitos pela Torre, de acordo com as posições de todas as outras peças do tabuleiro. Esta função deve ser acionada quando houver uma tentativa de mover essa torre.
     def movimentos_possíveis(self, info_peças):
