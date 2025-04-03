@@ -384,7 +384,15 @@ def eventos_xadrez(tam_tabuleiro, evento, casa_origem, info_peças, vez, sidebar
                 
                 #Move a peça.
                 peça_selecionada.mover_peça(casa_clicada, info_peças, tam_tabuleiro)
-                
+
+                #Se for uma torre ou um rei, e a peça ainda não tiver sido movida, a informação é atualizada. Isso é importante para verificar questões de roque.
+                if peça_selecionada.tipo in ['rei', 'torre']:
+                    
+                    #Se não tiver sido movida, agora é movida. Se já tiver sido movida, mantém assim.
+                    if peça_selecionada.movida == False:
+
+                        peça_selecionada.movida = True
+                        
                 #Checa se alguma peça do time oposto foi capturada e deleta ela com base nisso.
                 grupo_cor_oposta = 'pretas' if vez == 'brancas' else 'brancas'
 
