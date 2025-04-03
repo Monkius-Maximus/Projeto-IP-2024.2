@@ -3,6 +3,7 @@ import configuracoes as cfg
 from torre import Torre
 from peao import Peão
 from rei import Rei
+from rainha import Rainha
 
 #Função feita para inicializar a tela. É chamada no início do jogo para configurar o menu.
 def _init_tela():
@@ -554,6 +555,13 @@ def definir_peças(dict_icons, tam_tabuleiro):
                 rei.criar_imagem(dict_icons[tipo_peça])  # Cria a sua imagem desenhável de acordo com seu tipo e cor.
                 grupo = cor_info[cor]  # Associa ele ao grupo que pertence conforme sua cor.
                 info_peças[grupo].append(rei)  # Adiciona ele no dicionário de todas as peças de acordo com seu grupo de cor.
+
+        elif peça == 'rainha':  
+          for casa in casas_iniciais:
+            rainha = Rainha(cor, casa, tam_tabuleiro, info_peças)  # Cria o objeto da rainha.
+            rainha.criar_imagem(dict_icons[tipo_peça])  # Associa a imagem correta.
+            grupo = cor_info[cor]  # Define a qual grupo pertence.
+            info_peças[grupo].append(rainha)  # Adiciona no dicionário das peças.
 
     return info_peças
 
