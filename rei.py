@@ -2,8 +2,10 @@ from base_peça import Base
 
 class Rei(Base):
 
-    tipo='rei'
+    #O método construtor é herdado da classe Base.
 
+    tipo = 'rei'
+    movida = False
 
     def movimentos_possíveis(self, info_peças):
         # Aqui você deve implementar a lógica para determinar os movimentos possíveis do rei
