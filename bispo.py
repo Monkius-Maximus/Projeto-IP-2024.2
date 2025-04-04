@@ -5,7 +5,7 @@ class Bispo(Base):
     def __init__(self, cor, casa, tam_tabuleiro, info_peças):
         super().__init__(cor, casa, tam_tabuleiro, info_peças)
         self.tipo = "bispo"
-        self.cor_tabuleiro = self.definir_cor_tabuleiro(casa)  # Ainda pode deixar isso se quiser, mas não é necessário pro movimento
+        self.cor_tabuleiro = self.definir_cor_tabuleiro(casa)  # Opcional, só visual
 
     def definir_cor_tabuleiro(self, casa):
         linha, coluna = casa
@@ -22,15 +22,17 @@ class Bispo(Base):
                 nova_linha += dx
                 nova_coluna += dy
 
-                if 0 <= nova_linha < 8 and 0 <= nova_coluna < 8:
-
-                    if (nova_linha, nova_coluna) in info_peças:
-                        if info_peças[(nova_linha, nova_coluna)].cor != self.cor:
-                            movimentos.append((nova_linha, nova_coluna))  # Pode capturar peça adversária
-                        break  # Para ao encontrar qualquer peça
-                    else:
-                        movimentos.append((nova_linha, nova_coluna))  # Casa vazia
-                else:
+                if not (0 <= nova_linha < 8 and 0 <= nova_coluna < 8):
                     break  # Fora do tabuleiro
+
+                pos = (nova_linha, nova_coluna)
+                peça_no_caminho = info_peças.get(pos)
+
+                if peça_no_caminho:
+                    if peça_no_caminho.cor != self.cor:
+                        movimentos.append(pos)  # Pode capturar
+                    break  # Para sempre ao encontrar qualquer peça
+                else:
+                    movimentos.append(pos)  # Casa vazia
 
         return movimentos
