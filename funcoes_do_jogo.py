@@ -387,6 +387,9 @@ def eventos_xadrez(tam_tabuleiro, evento, casa_origem, info_peças, vez, sidebar
                 #Move a peça.
                 peça_selecionada.mover_peça(casa_clicada, info_peças, tam_tabuleiro)
 
+                #Verifica se ela está dando xeque no rei adversário.
+                peça_selecionada.definir_dando_xeque(info_peças, vez)
+
                 #Se for uma torre ou um rei, e a peça ainda não tiver sido movida, a informação é atualizada. Isso é importante para verificar questões de roque.
                 if peça_selecionada.tipo in ['rei', 'torre']:
                     

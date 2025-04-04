@@ -7,6 +7,9 @@ class Base:
 
     cor = 'branca' ou 'preta'
     casa = (0, 0); (0, 1), etc."""
+
+    dando_xeque = False #No início, nenhuma peça dá xeque no rei. Naturalmente, esse método será inútil para o rei, pois ele não pode dar xeque no rei adversário.
+
     def __init__(self, cor, casa, tam_tabuleiro, info_peças):
 
         self.cor = cor
@@ -24,6 +27,21 @@ class Base:
         #Atualiza a casa da peça e a posição conforme o tabuleiro.
         self.casa = nova_casa
         self.pos = self.descobrir_pos(nova_casa, tam_tabuleiro)
+
+    #Função para verificar se a peça atual está dando xeque no rei adversário. Naturalmente, esse método será inútil para o rei, pois ele não pode dar xeque no rei adversário.
+    def definir_dando_xeque(self, info_peças, vez):
+
+        cor_oposta = 'brancas' if vez == 'pretas' else 'pretas'
+
+        for peça in info_peças[cor_oposta]:
+
+            if peça.tipo == 'rei':
+
+                if peça.casa in self.movimentos_possíveis(info_peças):
+
+                    peça.em_xeque = True
+                    self.dando_xeque = True
+                    print('Xeque!')
 
     #Define o icon desenhável de cada peça.
     def definir_peça(self, dict_icons):

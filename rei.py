@@ -6,6 +6,7 @@ class Rei(Base):
 
     tipo = 'rei'
     movida = False
+    em_xeque = False #No início do jogo, ambos dos reis não estão em xeque.
 
     def movimentos_possíveis(self, info_peças):
         # Aqui você deve implementar a lógica para determinar os movimentos possíveis do rei
