@@ -12,7 +12,7 @@ class Bispo(Base):
         linha, coluna = casa
         return "claro" if (linha + coluna) % 2 == 0 else "escuro"
 
-    def movimentos_possiveis(self, info_peças, tam_tabuleiro):
+    def movimentos_possíveis(self, info_peças, tam_tabuleiro):
         # Retorna todas as casas que o bispo pode alcançar, garantindo que ele fique na mesma cor
         movimentos = []
         direcoes = [(1, 1), (1, -1), (-1, 1), (-1, -1)]  # Direções diagonais
