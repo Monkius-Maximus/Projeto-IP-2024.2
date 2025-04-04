@@ -46,5 +46,5 @@ class Peão(Base):
                         movimentos_possíveis.append((nova_linha, nova_coluna))
                     elif (cor_peão == 'preta' or cor_peão == 'preto') and (peça_alvo.cor == 'branca' or peça_alvo.cor == 'branco'):
                         movimentos_possíveis.append((nova_linha, nova_coluna))
-        
+
         return movimentos_possíveis

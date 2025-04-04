@@ -382,10 +382,16 @@ def eventos_xadrez(tam_tabuleiro, evento, casa_origem, info_peças, vez, sidebar
             peça_selecionada = encontrar_peça_selecionada(casa_origem, info_peças, vez)
 
             #Se ela pode ir para onde o usuário clicou.
-            if casa_clicada in peça_selecionada.movimentos_possíveis(info_peças):
+            movimentos_possíveis = peça_selecionada.movimentos_possíveis(info_peças) #Define movimentos possíveis desconsiderando xeque do próprio rei
+            movimentos_possíveis = peça_selecionada.rem_lances_inválidos(info_peças, movimentos_possíveis) #Restringe os movimentos possíveis aos que não deixam o rei em xeque.
+
+            #Se o lance tentado para esta peça é lícito.
+            if casa_clicada in movimentos_possíveis:
                 
                 #Move a peça.
                 peça_selecionada.mover_peça(casa_clicada, info_peças, tam_tabuleiro)
+
+                #Se o usuário de alguma cor acabou de se mover, então é certo que o rei dele não está mais em xeque, pelas regras. Portanto, o elemento em_xeque do rei dele se torna False, e os elementos dando_xeque das peças opostas se tornam todos False.
 
                 #Verifica se ela está dando xeque no rei adversário.
                 peça_selecionada.definir_dando_xeque(info_peças, vez)

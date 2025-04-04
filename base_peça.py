@@ -29,7 +29,7 @@ class Base:
         self.pos = self.descobrir_pos(nova_casa, tam_tabuleiro)
 
     #Função para verificar se a peça atual está dando xeque no rei adversário. Naturalmente, esse método será inútil para o rei, pois ele não pode dar xeque no rei adversário.
-    def definir_dando_xeque(self, info_peças, vez):
+    def definir_dando_xeque(self, info_peças, vez, simulação=False,daria_xeque=False):
 
         cor_oposta = 'brancas' if vez == 'pretas' else 'pretas'
 
@@ -38,10 +38,60 @@ class Base:
             if peça.tipo == 'rei':
 
                 if peça.casa in self.movimentos_possíveis(info_peças):
+                    
+                    if not(simulação):
+                            
+                        peça.em_xeque = True
+                        self.dando_xeque = True
+                    
+                    else:
+                        
+                        daria_xeque = True
+                
+        if simulação:
 
-                    peça.em_xeque = True
-                    self.dando_xeque = True
-                    print('Xeque!')
+            return daria_xeque
+
+    #Função para remover lances inválidos. Todas as peças vão poder gerar uma lista de movimentos possíveis quando algum lance for requisitado dela. Nesse momento, nós queremos remover os lances inválidos dela (os lances que colocam o rei em xeque).
+    def rem_lances_inválidos(self, info_peças, movimentos_possíveis):
+
+        #Lista com todos os movimentos inválidos desta peça.
+        movimentos_inválidos = []
+
+        #Salva-se a casa antiga que a peça estava.
+        antiga_casa = self.casa
+
+        #Para cada casa que esta peça atualmente pode ir, verificar-se-á se esta casa deixa ou coloca o rei em xeque. Se sim, é inválida. Adiciona-se na lista de movimentos inválidos.
+        for nova_casa in movimentos_possíveis:
+
+            #Para cada movimento possível, faz-se uma simulação de movimento para verificar depois se o rei fica em xeque.
+            self.casa = nova_casa
+
+            #Define a cor adversária e a cor do jogador atual.
+            grupo_cor_oposta = 'brancas' if self.cor in ['preta', 'preto'] else 'pretas'
+            vez = 'brancas' if grupo_cor_oposta == 'pretas' else 'pretas'
+
+            #Para todas as peças da cor adversária, verifica-se se ela dá xeque no rei considerando a simulação.
+            for peça in info_peças[grupo_cor_oposta]:
+
+                daria_xeque = peça.definir_dando_xeque(info_peças, grupo_cor_oposta, True)
+
+                captura_na_simulação = peça.casa == nova_casa
+
+                if daria_xeque == True and not(captura_na_simulação):
+
+                    #Se alguma peça dá xeque no rei após o lance da simulação ser feita, então já descobrimos que o lance em questão é inválido. Portanto, adiciona-se o movimento na lista de movimentos inválidos e não se procede com a verificação para ver se outras peças dão xeque.
+
+                    movimentos_inválidos.append(nova_casa)
+                    break
+
+        #Após a simulação ser feita, a casa volta a ser o valor original.
+        self.casa = antiga_casa
+
+        #Atualiza a lista de movimentos_possíveis retirando os movimentos inválidos.
+        movimentos_possíveis = list(set(movimentos_possíveis) - set(movimentos_inválidos))
+
+        return movimentos_possíveis
 
     #Define o icon desenhável de cada peça.
     def definir_peça(self, dict_icons):

@@ -10,7 +10,7 @@ class Rei(Base):
 
     def movimentos_possíveis(self, info_peças):
         # Aqui você deve implementar a lógica para determinar os movimentos possíveis do rei
-        movimentos = []
+        movimentos_possíveis = []
         linha, coluna = self.casa
 
         # O rei pode mover uma casa em qualquer direção
@@ -20,9 +20,9 @@ class Rei(Base):
                     continue  # Ignora a posição atual
                 nova_casa = (linha + d_linha, coluna + d_coluna)
                 if self.casa_valida(nova_casa, info_peças):
-                    movimentos.append(nova_casa)
+                    movimentos_possíveis.append(nova_casa)
 
-        return movimentos
+        return movimentos_possíveis
 
     def casa_valida(self, nova_casa, info_peças):
         # Verifica se a nova casa está dentro dos limites do tabuleiro
