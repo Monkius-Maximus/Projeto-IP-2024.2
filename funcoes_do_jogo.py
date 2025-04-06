@@ -5,6 +5,8 @@ from peao import Peão
 from rei import Rei
 from rainha import Rainha
 from bispo import Bispo
+from cavalo import Cavalo
+
 
 #Função feita para inicializar a tela. É chamada no início do jogo para configurar o menu.
 def _init_tela():
@@ -579,7 +581,14 @@ def definir_peças(dict_icons, tam_tabuleiro):
                 bispo.criar_imagem(dict_icons[tipo_peça])
                 grupo = cor_info[cor]
                 info_peças[grupo].append(bispo)
-
+                
+        elif peça == 'cavalo':
+            for casa in casas_iniciais:
+                cavalo = Cavalo(cor, casa, tam_tabuleiro, info_peças)
+                cavalo.criar_imagem(dict_icons[tipo_peça])
+                grupo = cor_info[cor]
+                info_peças[grupo].append(cavalo)
+                
     return info_peças
 
 #Função para desenhar todas as peças no tabuleiro.
