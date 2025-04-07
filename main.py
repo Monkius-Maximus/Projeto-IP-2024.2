@@ -22,6 +22,11 @@ tela = fj._init_tela()
 #Salva os tamanhos x e y reais da tela, após ajustada para atender às proporções do monitor em questão.
 tam_tela = tela_x, tela_y = tela.get_size()
 
+#Sobre a tela do final.
+
+#Inicializando informações sobre o filtro preto (quando houver tela de empate ou tela de jogador que venceu).
+filtro = fj._init_filtro(tela_x, tela_y)
+
 #Objeto para administrar o tempo do programa.
 relógio = pygame.time.Clock()
 
@@ -152,26 +157,46 @@ while usr_jogando:
             #Eventos de menu são resolvidos e a tela atual é atualizada. Além disso, quando o usuário apertar em 'Jogar', as informações sobre as peças são adicionadas na variável info_peças. Para isso, é necessário o uso da biblioteca dict_icons, para associar cada peça ao seu png. O retângulo do botão de jogar é passado para saber se o usuário clicou no botão.
             tela_atual, info_peças = fj.eventos_menu(evento, jogar.get_rect(topleft=pos_jogar), dict_icons, tam_tabuleiro)
 
-        #Se a tela for do jogo de xadrez, lida-se com os eventos interessantes que a tela do xadrez pode receber.
+        #Se a tela for do jogo de xadrez e se não for a tela do fim (empate ou ganhar), lida-se com os eventos interessantes que a tela do xadrez pode receber. Por isso o comparativo do == é usado neste caso.
         elif tela_atual == 'xadrez':
 
             #Eventos da tela do xadrez são resolvidos e a tela atual é atualizada. A casa de destino não é enviada como parâmetro, pois, ela sempre será vazia ao checar novos eventos.
             tela_atual, casa_origem, info_peças, vez = fj.eventos_xadrez(tam_tabuleiro, evento, casa_origem, info_peças, vez, sidebar_contagem)
-
+        
+        #Caso a tela atual seja a tela do final do jogo, ou seja, empate ou alguém venceu. Os eventos verificados para essas telas possíveis são os mesmos eventos.
+        else:
+            
+            tela_atual = fj.eventos_tela_final(tela_atual, evento)
+    
     #Desenhando as coisas no aplicativo de acordo com a tela do menu.
     if tela_atual == 'menu':
 
         #Desenha-se o menu com o título principal e o botão de jogar.
         fj.desenhar_menu(tela, jogar, pos_jogar, txt_menu, pos_txt_menu)
 
-    #Desenhando as coisas no aplicativo de acordo com a tela do xadrez.
-    elif tela_atual == 'xadrez':
+    #Desenhando as coisas no aplicativo de acordo com a tela do xadrez. O in é usado, pois é possível que a string seja 'xadrez_fim', quando, além da tela ser do xadrez, também é necessário imprimir as informações sobre o fim do jogo.
+    elif 'xadrez' in tela_atual:
+
+        # tela_atual = 'xadrez_empate'
 
         #Desenha-se a tela do xadrez com as peças e todo o resto.
         fj.desenhar_xadrez(tela, tabuleiro, info_peças)
 
         #Desenha-se a sidebar do xadrez, no que se diz respeito aos contadoress.
         fj.desenhar_sidebar_contagem(tela, sidebar_contagem)
+
+        #Se a tela atual também for a tela do final do jogo (Ex.: 'xadrez_empate'; 'xadrez_pretas_venceram'; 'xadrez_brancas_venceram'). Para isso, é necessário verificar se for empate ou se alguém venceu.
+        if tela_atual != 'xadrez':
+            
+            venceram = str()
+
+            #Se foi empate, venceram é igual ao grupo das peças que venceram. Caso contrário, permanece vazia, conforme foi feito na inicialização = str().
+            if tela_atual != 'xadrez_empate':
+                
+                venceram = tela_atual.split('_')[1] #O modelo é sempre, por exemplo: 'xadrez_pretas_venceram' ou 'xadrez_brancas_venceram'.
+            
+            #Chama a função de desenhar a tela final.
+            fj.desenhar_tela_final(tela, filtro, venceram)
 
     #Atualiza a tela desde as últimas alterações.
     pygame.display.update()

@@ -1,5 +1,6 @@
 import pygame
 import configuracoes as cfg
+import os
 from torre import Torre
 from peao import Peão
 from rei import Rei
@@ -28,6 +29,15 @@ def _init_tela():
     pygame.display.set_caption(cfg.str_janela_menu) #Define título do menu.
 
     return tela
+
+#Função feita para inicializar o filtro da tela de fim. 
+def _init_filtro(tela_x, tela_y):
+
+    filtro = pygame.Surface((tela_x, tela_y))
+    filtro.fill(cfg.filtro_cor)
+    filtro.set_alpha(cfg.filtro_transparência)
+
+    return filtro
 
 #Função para inicializar o título que aparece no menu principal.
 def _init_tit_menu(tela_x, tela_y):
@@ -467,6 +477,39 @@ def eventos_xadrez(tam_tabuleiro, evento, casa_origem, info_peças, vez, sidebar
 
     return tela_atual, casa_origem, info_peças, vez
 
+#Função para lidar com os eventos da tela final (quando deu empate ou alguém venceu a partida).
+def eventos_tela_final(tela_atual, evento):
+
+    #Se uma tecla foi clicada.
+    if evento.type == pygame.KEYDOWN:
+        
+        #Esc.
+
+        if evento.key == pygame.K_ESCAPE:
+
+            tela_atual = 'menu'
+
+        #Backspace.
+
+        elif evento.key == pygame.K_BACKSPACE:
+
+            #O pygame é finalizado.
+            pygame.quit()
+
+            #Limpa o terminal no final.
+            os.system('clear')
+
+            #O programa em si é finalizado.
+            exit()
+
+        #Enter.
+
+        elif evento.key == pygame.K_RETURN:
+
+            tela_atual = 'xadrez'
+
+    return tela_atual
+
 #Função para fazer os desenhos da tela menu.
 def desenhar_menu(tela, jogar, pos_jogar, txt_menu, pos_txt_menu):
 
@@ -516,6 +559,80 @@ def desenhar_sidebar_contagem(tela, sidebar_contagem):
                 for peça, (icon, posição, texto_atual) in peças_cor.items():
 
                     tela.blit(icon, posição)
+
+#Função para desenhar a tela final do jogo (Empate ou se alguém venceu).
+def desenhar_tela_final(tela, filtro, venceram):
+
+    #Função para desenhar a tela final em caso de empate.
+    def desenhar_empate(tela):
+        
+        #Informações sobre o texto sinalizando que é empate.
+
+        #Definindo a fonte e o tamanho de todos os textos desenháveis da tela de empate.
+        fonte = pygame.font.SysFont('Ubuntu', 48)
+
+        #Definindo texto informando o empate.
+        texto_empate = fonte.render('Empate!', True, (255, 255, 255))
+
+        #Definindo a posição do texto informando o empate na tela.
+        tela_x, tela_y = tela.get_size()
+        centro_x = tela_x / 2
+        centro_y = tela_y / 2
+        
+        texto_empate_x = centro_x - texto_empate.get_size()[0] / 2
+        texto_empate_y = (centro_y - texto_empate.get_size()[1] / 2) - 100
+
+        pos_texto_empate = (texto_empate_x, texto_empate_y)
+
+        #Definindo texto informando a possibilidade de voltar para o menu.
+        texto_voltar_menu = fonte.render('Aperte Esc para voltar para o menu.', True, (255, 255, 255))
+
+        #Definindo a posição do texto informando a possibilidade de voltar para o menu na tela.
+        texto_voltar_menu_x = centro_x - texto_voltar_menu.get_size()[0] / 2
+        texto_voltar_menu_y = texto_empate_y + 100
+        
+        pos_texto_voltar_menu = (texto_voltar_menu_x, texto_voltar_menu_y)
+
+        #Definindo texto informando a possibilidade de começar um novo jogo.
+        texto_novo_jogo = fonte.render('Aperte Enter para começar um novo jogo.', True, (255, 255, 255))
+
+        #Definindo a posição do texto informando a possibilidade de começar um novo jogo na tela.
+        texto_novo_jogo_x = centro_x - texto_novo_jogo.get_size()[0] / 2
+        texto_novo_jogo_y = texto_voltar_menu_y + 50
+
+        pos_texto_novo_jogo = (texto_novo_jogo_x, texto_novo_jogo_y)
+
+        #Definindo texto informando a possibilidade de sair do jogo.
+        texto_sair = fonte.render('Aperte \'remover caractere\' para sair do jogo.', True, (255, 255, 255))
+
+        #Definindo a posição do texto informando a possibilidade de sair do jogo na tela.
+        texto_sair_x = centro_x - texto_sair.get_size()[0] / 2
+        texto_sair_y = texto_novo_jogo_y + 50
+
+        pos_texto_sair = (texto_sair_x, texto_sair_y)
+
+        #Desenhando os textos na tela.
+        tela.blit(texto_empate, pos_texto_empate)
+        tela.blit(texto_voltar_menu, pos_texto_voltar_menu)
+        tela.blit(texto_novo_jogo, pos_texto_novo_jogo)
+        tela.blit(texto_sair, pos_texto_sair)
+
+    #Função para desenhar a tela final em caso de um grupo que venceu.
+    def desenhar_venceram(tela, venceram):
+        pass
+
+    #Desenha o filtro na tela. Independente de se for empate ou se alguém venceu, isso é necessário.
+    tela.blit(filtro, (0, 0))
+
+    #Se a tela for uma tela de empate.
+    if venceram == '':
+
+        desenhar_empate(tela)
+
+    #Se a tela for uma tela de alguém que venceu.
+    else:
+
+        desenhar_venceram(tela, venceram)
 
 #Função que define as informações iniciais sobre as peças em cada casa. O dicionário é passado porque, para cada peça, é necessário saber qual é o png associado a ela de acordo com seu tipo.
 def definir_peças(dict_icons, tam_tabuleiro):
