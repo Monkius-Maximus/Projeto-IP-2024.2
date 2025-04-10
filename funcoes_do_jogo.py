@@ -1,5 +1,6 @@
 import pygame
 import configuracoes as cfg
+import copy
 import os
 from torre import Torre
 from peao import Peão
@@ -719,3 +720,56 @@ def desenhar_peças(tela, info_peças):
 
             #Desenha a peça na tela.
             peça.desenhar(tela)
+
+def esta_em_xeque(cor, info_peças):
+    # Encontra o rei da cor
+    rei = None
+    for peça in info_peças[cor]:
+        if peça.tipo == 'rei':
+            rei = peça
+            break
+
+    if rei is None:
+        return False
+
+    # Verifica se alguma peça adversária pode capturá-lo
+    cor_adversaria = 'preto' if cor == 'branco' else 'branco'
+    for peça in info_peças[cor_adversaria]:
+        if rei.casa in peça.movimentos_possíveis(info_peças):
+            return True
+    return False
+
+def esta_em_xeque_mate(cor, info_peças):
+    if not esta_em_xeque(cor, info_peças):
+        return False
+
+    for peça in info_peças[cor]:
+        movimentos = peça.movimentos_possíveis(info_peças)
+        casa_original = peça.casa
+
+        for destino in movimentos:
+            # Simula o movimento
+            peça.casa = destino
+            peças_backup = {c: [p for p in lista] for c, lista in info_peças.items()}
+
+            # Remove qualquer peça capturada
+            capturada = None
+            for p in info_peças['branco' if cor == 'preto' else 'preto']:
+                if p.casa == destino:
+                    capturada = p
+                    info_peças['branco' if cor == 'preto' else 'preto'].remove(p)
+                    break
+
+            if not esta_em_xeque(cor, info_peças):
+                # Restaura estado e retorna False
+                peça.casa = casa_original
+                if capturada:
+                    info_peças[capturada.cor].append(capturada)
+                return False
+
+            # Restaura
+            peça.casa = casa_original
+            if capturada:
+                info_peças[capturada.cor].append(capturada)
+
+    return True
