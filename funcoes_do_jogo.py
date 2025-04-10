@@ -721,55 +721,55 @@ def desenhar_peças(tela, info_peças):
             #Desenha a peça na tela.
             peça.desenhar(tela)
 
-def esta_em_xeque(cor, info_peças):
-    # Encontra o rei da cor
-    rei = None
-    for peça in info_peças[cor]:
-        if peça.tipo == 'rei':
-            rei = peça
-            break
+def cor_padronizada(cor):
+    if "branco" in cor:
+        return "brancas"
+    elif "preto" in cor:
+        return "pretas"
+    return cor
 
+
+def esta_em_xeque(info_peças, cor):
+    cor = cor_padronizada(cor)
+    cor_inimiga = "pretas" if cor == "brancas" else "brancas"
+
+    # Encontra o rei da cor especificada
+    rei = next((p for p in info_peças[cor] if p.tipo == "rei"), None)
     if rei is None:
-        return False
+        return False  # Rei não encontrado, falha segura
 
-    # Verifica se alguma peça adversária pode capturá-lo
-    cor_adversaria = 'preto' if cor == 'branco' else 'branco'
-    for peça in info_peças[cor_adversaria]:
+    # Verifica se alguma peça inimiga pode capturar o rei
+    for peça in info_peças[cor_inimiga]:
         if rei.casa in peça.movimentos_possíveis(info_peças):
             return True
     return False
 
-def esta_em_xeque_mate(cor, info_peças):
-    if not esta_em_xeque(cor, info_peças):
+
+def esta_em_xeque_mate(info_peças, cor):
+    cor = cor_padronizada(cor)
+
+    if not esta_em_xeque(info_peças, cor):
         return False
 
     for peça in info_peças[cor]:
         movimentos = peça.movimentos_possíveis(info_peças)
-        casa_original = peça.casa
-
         for destino in movimentos:
             # Simula o movimento
+            backup = copy.deepcopy(info_peças)
+            casa_original = peça.casa
             peça.casa = destino
-            peças_backup = {c: [p for p in lista] for c, lista in info_peças.items()}
+            # Remove peça capturada
+            info_peças_temp = {
+                "brancas": [p for p in info_peças["brancas"] if p.casa != destino],
+                "pretas": [p for p in info_peças["pretas"] if p.casa != destino]
+            }
+            info_peças_temp[cor] = [p if p != peça else peça for p in info_peças_temp[cor]]
 
-            # Remove qualquer peça capturada
-            capturada = None
-            for p in info_peças['branco' if cor == 'preto' else 'preto']:
-                if p.casa == destino:
-                    capturada = p
-                    info_peças['branco' if cor == 'preto' else 'preto'].remove(p)
-                    break
-
-            if not esta_em_xeque(cor, info_peças):
-                # Restaura estado e retorna False
+            if not esta_em_xeque(info_peças_temp, cor):
+                # Movimento salva do xeque
                 peça.casa = casa_original
-                if capturada:
-                    info_peças[capturada.cor].append(capturada)
                 return False
-
             # Restaura
             peça.casa = casa_original
-            if capturada:
-                info_peças[capturada.cor].append(capturada)
-
+            info_peças = backup
     return True
