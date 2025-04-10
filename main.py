@@ -1,6 +1,7 @@
 import pygame, os
 import funcoes_do_jogo as fj
 import configuracoes as cfg
+import copy
 
 #Limpa o terminal para fazer impressões.
 os.system('clear')
@@ -162,6 +163,10 @@ while usr_jogando:
 
             #Eventos da tela do xadrez são resolvidos e a tela atual é atualizada. A casa de destino não é enviada como parâmetro, pois, ela sempre será vazia ao checar novos eventos.
             tela_atual, casa_origem, info_peças, vez = fj.eventos_xadrez(tam_tabuleiro, evento, casa_origem, info_peças, vez, sidebar_contagem)
+            cor_inimiga = "pretas" if vez == "brancas" else "brancas"
+            if fj.esta_em_xeque_mate(info_peças, cor_inimiga):
+               print("Xeque-mate!")
+               usr_jogando = False 
         
         #Caso a tela atual seja a tela do final do jogo, ou seja, empate ou alguém venceu. Os eventos verificados para essas telas possíveis são os mesmos eventos.
         else:
