@@ -15,6 +15,7 @@ class Rei(Base):
                 if d_linha == 0 and d_coluna == 0:
                     continue
                 nova_casa = (linha + d_linha, coluna + d_coluna)
+
                 if self.casa_valida(nova_casa, info_peças):
                     movimentos_possíveis.append(nova_casa)
 
@@ -108,6 +109,11 @@ class Rei(Base):
             for grupo_cor in info_peças:
                 for peça in info_peças[grupo_cor]:
                     if peça.casa == nova_casa:
+                        
+                        if peça.casa == (6, 5):
+
+                            print(f'Peça: {peça.tipo}')
+
                         cor_rei = 'brancas' if self.cor in ['branca', 'branco'] else 'pretas'
                         cor_peça_esbarrada = 'brancas' if peça.cor in ['branca', 'branco'] else 'pretas'
 

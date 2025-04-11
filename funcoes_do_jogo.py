@@ -431,24 +431,6 @@ def eventos_xadrez(tam_tabuleiro, evento, casa_origem, info_peças, vez, sidebar
                     if peça.tipo == 'rei':
                         peça.em_xeque = False
 
-                #Verifica se ela está dando xeque no rei adversário.
-                peça_selecionada.definir_dando_xeque(info_peças, vez)
-
-                #Verifica se o rei adversário está em xeque-mate.
-                grupo_cor_oposta = 'pretas' if vez == 'brancas' else 'brancas'
-
-                for peça in info_peças[grupo_cor_oposta]:
-
-                    if peça.tipo == 'rei':
-
-                        if peça.em_xeque == True:
-
-                            xeque_mate = esta_em_xeque_mate(info_peças, grupo_cor_oposta)
-
-                            if xeque_mate:
-
-                                tela_atual = 'xadrez_' + vez + '_venceram'
-
                 #Se for uma torre ou um rei, e a peça ainda não tiver sido movida, a informação é atualizada. Isso é importante para verificar questões de roque.
                 if peça_selecionada.tipo in ['rei', 'torre']:
                     
@@ -474,7 +456,6 @@ def eventos_xadrez(tam_tabuleiro, evento, casa_origem, info_peças, vez, sidebar
 
                          # Reproduz som de captura
                         pygame.mixer.Sound('sons/captura.mp3').play()
-
 
                         #Atualiza a sidebar passando como parâmetro o tipo da peça oposta, e sua cor.
 
@@ -502,6 +483,24 @@ def eventos_xadrez(tam_tabuleiro, evento, casa_origem, info_peças, vez, sidebar
                 if não_capturou:
                     #Som do movimento normal das peças de xadrez pelo tabuleiro
                     pygame.mixer.Sound('sons/movimento_peça.mp3').play()
+                
+                                #Verifica se ela está dando xeque no rei adversário.
+                peça_selecionada.definir_dando_xeque(info_peças, vez)
+
+                #Verifica se o rei adversário está em xeque-mate.
+                grupo_cor_oposta = 'pretas' if vez == 'brancas' else 'brancas'
+
+                for peça in info_peças[grupo_cor_oposta]:
+
+                    if peça.tipo == 'rei':
+
+                        if peça.em_xeque == True:
+
+                            xeque_mate = esta_em_xeque_mate(info_peças, grupo_cor_oposta)
+
+                            if xeque_mate:
+
+                                tela_atual = 'xadrez_' + vez + '_venceram'
 
                 #Troca a vez do jogador.
                 vez = 'pretas' if vez == 'brancas' else 'brancas'
@@ -799,6 +798,7 @@ def esta_em_xeque_mate(info_peças, cor):
         
         movimentos = peça.movimentos_possíveis(info_peças)
         movimentos = peça.rem_lances_inválidos(info_peças, movimentos)
+        print(f'Peça: {peça.tipo}; Cor: {peça.cor}; Casa: {peça.casa}; Lances possíveis: {movimentos}')
 
         if len(movimentos) > 0:
             xeque_mate = False
