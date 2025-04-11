@@ -416,9 +416,6 @@ def eventos_xadrez(tam_tabuleiro, evento, casa_origem, info_peças, vez, sidebar
             movimentos_possíveis = peça_selecionada.movimentos_possíveis(info_peças) #Define movimentos possíveis desconsiderando xeque do próprio rei
             movimentos_possíveis = peça_selecionada.rem_lances_inválidos(info_peças, movimentos_possíveis) #Restringe os movimentos possíveis aos que não deixam o rei em xeque.
 
-            tipo_roque = None
-            movimento_valido = False
-
             #Se o lance tentado para esta peça é lícito.
             if casa_clicada in movimentos_possíveis:
                 
