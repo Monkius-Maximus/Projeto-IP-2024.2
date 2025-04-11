@@ -568,9 +568,6 @@ def desenhar_menu(tela, capa_menu, jogar, pos_jogar, txt_menu, pos_txt_menu):
     #Desenhando o botão jogar na tela.
     tela.blit(jogar, pos_jogar)
 
-    #Desenhando o título do menu na tela.
-    tela.blit(txt_menu, pos_txt_menu)
-
 #Função para fazer os desenhos da tela do xadrez.
 def desenhar_xadrez(tela, tabuleiro, img_sidebar, info_peças):
 
