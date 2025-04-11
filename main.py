@@ -11,6 +11,14 @@ os.system('clear')
 #Inicializa os módulos do Pygame.
 pygame.init()
 
+#Som da peça sendo movida
+som_captura = pygame.mixer.Sound('sons/movimento_peça.mp3')
+
+#Inicia o mixer do pygame para o jogo ter sons
+
+pygame.mixer.init()
+
+
 #Sobre o menu.
 
 #Variável armazenando a tela atual do jogo. Começa com menu.
@@ -175,7 +183,7 @@ while usr_jogando:
            )
             
             #Para caso ocorra uma das duas principais possibilidades de empate
-            
+
         if casa_origem == () and 'brancas' in info_peças and 'pretas' in info_peças:
          if verificar_empate(info_peças, vez) or material_insuficiente(info_peças):
           tela_atual = 'xadrez_empate'

@@ -1,4 +1,5 @@
 import pygame
+import pygame.mixer
 import configuracoes as cfg
 import copy
 import os
@@ -9,9 +10,12 @@ from rainha import Rainha
 from bispo import Bispo
 from cavalo import Cavalo
 
+pygame.mixer.init()
+
 
 #Função feita para inicializar a tela. É chamada no início do jogo para configurar o menu.
 def _init_tela():
+
 
     #Informações do monitor atual.
     info_monitor = pygame.display.Info()
@@ -422,6 +426,10 @@ def eventos_xadrez(tam_tabuleiro, evento, casa_origem, info_peças, vez, sidebar
                 #Move a peça.
                 peça_selecionada.mover_peça(casa_clicada, info_peças, tam_tabuleiro)
 
+                #Som do movimento normal das peças de xadrez pelo tabuleiro
+                pygame.mixer.Sound('sons/movimento_peça.mp3').play()
+
+
                 #Se o usuário de alguma cor acabou de se mover, então é certo que o rei dele não está mais em xeque, pelas regras. Portanto, o elemento em_xeque do rei dele se torna False, e os elementos dando_xeque das peças opostas se tornam todos False.
                 movimento_valido = False
 
@@ -461,6 +469,10 @@ def eventos_xadrez(tam_tabuleiro, evento, casa_origem, info_peças, vez, sidebar
                         
                         #Remove a peça oposta, pois ela foi capturada.
                         info_peças[grupo_cor_oposta].remove(peça_oposta)
+
+                         # Reproduz som de captura
+                        pygame.mixer.Sound('sons/captura.mp3').play()
+
 
                         #Atualiza a sidebar passando como parâmetro o tipo da peça oposta, e sua cor.
 
