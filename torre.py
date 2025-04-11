@@ -13,7 +13,7 @@ class Torre(Base):
     def movimentos_possíveis(self, info_peças):
         
         linha_atual, coluna_atual = self.casa
-        cor_torre = self.cor
+        cor_torre = 'brancas' if self.cor in ['branca', 'branco'] else 'pretas'
         movimentos_possíveis = []
         
         #Obtém todas as casas ocupadas no tabuleiro, e associa cada casa à peça que está ocupando essa casa.
@@ -57,7 +57,9 @@ class Torre(Base):
                     if esbarrou_peça:
 
                         #Se esta casa é uma captura possível, e, portanto, um movimento possível.
-                        if casas_ocupadas[(nova_linha, nova_coluna)].cor != cor_torre:
+                        cor_peça_esbarrada = 'brancas' if casas_ocupadas[(nova_linha, nova_coluna)].cor in ['branca', 'branco'] else 'pretas'
+
+                        if cor_peça_esbarrada != cor_torre:
 
                             movimentos_possíveis.append((nova_linha, nova_coluna))
                 

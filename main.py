@@ -165,12 +165,6 @@ while usr_jogando:
            tela_atual, casa_origem, info_peças, vez = fj.eventos_xadrez(
            tam_tabuleiro, evento, casa_origem, info_peças, vez, sidebar_contagem
            )
-
-           cor_que_jogou = "pretas" if vez == "brancas" else "brancas"
-           print(f"Verificando xeque-mate para: {vez}")  # vez é quem vai jogar agora
-           if fj.esta_em_xeque_mate(info_peças, vez):  # quem vai jogar está sem movimentos?
-               print("Xeque-mate!")
-               usr_jogando = False
         
         #Caso a tela atual seja a tela do final do jogo, ou seja, empate ou alguém venceu. Os eventos verificados para essas telas possíveis são os mesmos eventos.
         else:

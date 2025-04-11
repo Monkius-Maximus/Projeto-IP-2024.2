@@ -409,6 +409,22 @@ def eventos_xadrez(tam_tabuleiro, evento, casa_origem, info_peças, vez, sidebar
                 #Verifica se ela está dando xeque no rei adversário.
                 peça_selecionada.definir_dando_xeque(info_peças, vez)
 
+                #Verifica se o rei adversário está em xeque-mate.
+                grupo_cor_oposta = 'pretas' if vez == 'brancas' else 'brancas'
+
+                for peça in info_peças[grupo_cor_oposta]:
+
+                    if peça.tipo == 'rei':
+
+                        if peça.em_xeque == True:
+
+                            xeque_mate = esta_em_xeque_mate(info_peças, grupo_cor_oposta)
+
+                            if xeque_mate:
+
+                                tela_atual = 'xadrez_' + vez + '_venceram'
+                                print(tela_atual)
+
                 #Se for uma torre ou um rei, e a peça ainda não tiver sido movida, a informação é atualizada. Isso é importante para verificar questões de roque.
                 if peça_selecionada.tipo in ['rei', 'torre']:
                     
@@ -721,55 +737,16 @@ def desenhar_peças(tela, info_peças):
             #Desenha a peça na tela.
             peça.desenhar(tela)
 
-def cor_padronizada(cor):
-    if "branco" in cor:
-        return "brancas"
-    elif "preto" in cor:
-        return "pretas"
-    return cor
-
-
-def esta_em_xeque(info_peças, cor):
-    cor = cor_padronizada(cor)
-    cor_inimiga = "pretas" if cor == "brancas" else "brancas"
-
-    # Encontra o rei da cor especificada
-    rei = next((p for p in info_peças[cor] if p.tipo == "rei"), None)
-    if rei is None:
-        return False  # Rei não encontrado, falha segura
-
-    # Verifica se alguma peça inimiga pode capturar o rei
-    for peça in info_peças[cor_inimiga]:
-        if rei.casa in peça.movimentos_possíveis(info_peças):
-            return True
-    return False
-
-
 def esta_em_xeque_mate(info_peças, cor):
-    cor = cor_padronizada(cor)
 
-    if not esta_em_xeque(info_peças, cor):
-        return False
+    xeque_mate = True   
 
     for peça in info_peças[cor]:
+        
         movimentos = peça.movimentos_possíveis(info_peças)
-        for destino in movimentos:
-            # Simula o movimento
-            backup = copy.deepcopy(info_peças)
-            casa_original = peça.casa
-            peça.casa = destino
-            # Remove peça capturada
-            info_peças_temp = {
-                "brancas": [p for p in info_peças["brancas"] if p.casa != destino],
-                "pretas": [p for p in info_peças["pretas"] if p.casa != destino]
-            }
-            info_peças_temp[cor] = [p if p != peça else peça for p in info_peças_temp[cor]]
+        movimentos = peça.rem_lances_inválidos(info_peças, movimentos)
 
-            if not esta_em_xeque(info_peças_temp, cor):
-                # Movimento salva do xeque
-                peça.casa = casa_original
-                return False
-            # Restaura
-            peça.casa = casa_original
-            info_peças = backup
-    return True
+        if len(movimentos) > 0:
+            xeque_mate = False
+
+    return xeque_mate

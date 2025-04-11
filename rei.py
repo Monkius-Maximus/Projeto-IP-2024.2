@@ -26,7 +26,11 @@ class Rei(Base):
             # Não pode ser ocupada por uma peça da mesma cor
             for grupo_cor in info_peças:
                 for peça in info_peças[grupo_cor]:
-                    if peça.casa == nova_casa and peça.cor == self.cor:
-                        return False
+                    if peça.casa == nova_casa:
+                        cor_rei = 'brancas' if self.cor in ['branca', 'branco'] else 'pretas'
+                        cor_peça_esbarrada = 'brancas' if peça.cor in ['branca', 'branco'] else 'pretas'
+
+                        if cor_rei == cor_peça_esbarrada:
+                            return False
             return True
         return False
