@@ -8,7 +8,7 @@ os.system('clear')
 
 #Inicializa os módulos do Pygame.
 pygame.init()
-
+pygame.mixer.init()
 #Sobre o menu.
 
 #Variável armazenando a tela atual do jogo. Começa com menu.
@@ -20,6 +20,11 @@ usr_jogando = True
 #Inicializa a tela do programa de acordo com as exigências do menu.
 tela = fj._init_tela()
 
+# Aqui vamos carregar a música de fundo por enquanto só o de loop
+musica_fundo = pygame.mixer.Sound('audio/musica_fundo.mp3')
+
+# música de fundo está tocando ou não
+musica_tocando = False
 #Salva os tamanhos x e y reais da tela, após ajustada para atender às proporções do monitor em questão.
 tela_x, tela_y = tela.get_size()
 
@@ -39,6 +44,13 @@ txt_jogar, pos_txt_jogar = fj._init_txt_jogar(jogar)
 
 #Colocando o texto 'Jogar' na superfície do botão Jogar.
 jogar.blit(txt_jogar, pos_txt_jogar) #Desenha o texto 'Jogar' no botão Jogar.
+
+ # Se a música de fundo não estiver tocando e o jogo não estiver terminado
+if not musica_tocando and  usr_jogando:
+        # Toca a música de fundo em loop
+        musica_fundo.play(loops=-1)
+        # Define a variável para indicar que a música está tocando
+        musica_tocando = True
 
 #Sobre a tela do xadrez.
 
