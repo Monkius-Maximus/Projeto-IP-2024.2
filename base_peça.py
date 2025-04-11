@@ -62,6 +62,9 @@ class Base:
         #Salva-se a casa antiga que a peça estava.
         antiga_casa = self.casa
 
+        casa_peça_capturada = ()
+        peça_capturada = None
+
         #Para cada casa que esta peça atualmente pode ir, verificar-se-á se esta casa deixa ou coloca o rei em xeque. Se sim, é inválida. Adiciona-se na lista de movimentos inválidos.
         for nova_casa in movimentos_possíveis:
 
@@ -72,19 +75,33 @@ class Base:
             grupo_cor_oposta = 'brancas' if self.cor in ['preta', 'preto'] else 'pretas'
             vez = 'brancas' if grupo_cor_oposta == 'pretas' else 'pretas'
 
+            captura = False
+
+            #Para cada movimento na simulação, é necessário retirar a peça caso ela tenha sido capturada na simulação.
+            for peça in info_peças[grupo_cor_oposta]:
+                if peça.casa == nova_casa:
+                    captura = True
+                    casa_peça_capturada = peça.casa
+                    peça_capturada = peça
+                    peça.casa = ()
+
             #Para todas as peças da cor adversária, verifica-se se ela dá xeque no rei considerando a simulação.
             for peça in info_peças[grupo_cor_oposta]:
+                
+                if peça.casa != ():
 
-                daria_xeque = peça.definir_dando_xeque(info_peças, grupo_cor_oposta, True)
+                    daria_xeque = peça.definir_dando_xeque(info_peças, grupo_cor_oposta, True)
 
-                captura_na_simulação = peça.casa == nova_casa
+                    if daria_xeque == True:
 
-                if daria_xeque == True and not(captura_na_simulação):
+                        #Se alguma peça dá xeque no rei após o lance da simulação ser feita, então já descobrimos que o lance em questão é inválido. Portanto, adiciona-se o movimento na lista de movimentos inválidos e não se procede com a verificação para ver se outras peças dão xeque.
 
-                    #Se alguma peça dá xeque no rei após o lance da simulação ser feita, então já descobrimos que o lance em questão é inválido. Portanto, adiciona-se o movimento na lista de movimentos inválidos e não se procede com a verificação para ver se outras peças dão xeque.
+                        movimentos_inválidos.append(nova_casa)
+                        break
 
-                    movimentos_inválidos.append(nova_casa)
-                    break
+            #A peça capturada é reestabelecida no lugar que ela estava antes da simulação.
+            if captura:
+                peça_capturada.casa = casa_peça_capturada
 
         #Após a simulação ser feita, a casa volta a ser o valor original.
         self.casa = antiga_casa
