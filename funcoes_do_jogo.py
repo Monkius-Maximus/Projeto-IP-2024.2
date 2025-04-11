@@ -426,12 +426,10 @@ def eventos_xadrez(tam_tabuleiro, evento, casa_origem, info_peças, vez, sidebar
                 #Move a peça.
                 peça_selecionada.mover_peça(casa_clicada, info_peças, tam_tabuleiro)
 
-                #Som do movimento normal das peças de xadrez pelo tabuleiro
-                pygame.mixer.Sound('sons/movimento_peça.mp3').play()
-
-
                 #Se o usuário de alguma cor acabou de se mover, então é certo que o rei dele não está mais em xeque, pelas regras. Portanto, o elemento em_xeque do rei dele se torna False, e os elementos dando_xeque das peças opostas se tornam todos False.
-                movimento_valido = False
+                for peça in info_peças[vez]:
+                    if peça.tipo == 'rei':
+                        peça.em_xeque = False
 
                 #Verifica se ela está dando xeque no rei adversário.
                 peça_selecionada.definir_dando_xeque(info_peças, vez)
@@ -460,12 +458,16 @@ def eventos_xadrez(tam_tabuleiro, evento, casa_origem, info_peças, vez, sidebar
                         peça_selecionada.movida = True
                         
                 #Checa se alguma peça do time oposto foi capturada e deleta ela com base nisso.
+                não_capturou = True
+
                 grupo_cor_oposta = 'pretas' if vez == 'brancas' else 'brancas'
 
                 for peça_oposta in info_peças[grupo_cor_oposta]:
                     
                     #Se há uma peça da cor oposta na casa para a qual a peça foi.
                     if peça_oposta.casa == casa_clicada:
+
+                        não_capturou = True
                         
                         #Remove a peça oposta, pois ela foi capturada.
                         info_peças[grupo_cor_oposta].remove(peça_oposta)
@@ -496,6 +498,10 @@ def eventos_xadrez(tam_tabuleiro, evento, casa_origem, info_peças, vez, sidebar
 
                                 #Atualiza o texto com a quantidade de peças deste tipo capturadas.
                                 sidebar_contagem['textos'][grupo_cor_oposta][tipo_peça][2] = texto_atual
+
+                if não_capturou:
+                    #Som do movimento normal das peças de xadrez pelo tabuleiro
+                    pygame.mixer.Sound('sons/movimento_peça.mp3').play()
 
                 #Troca a vez do jogador.
                 vez = 'pretas' if vez == 'brancas' else 'brancas'

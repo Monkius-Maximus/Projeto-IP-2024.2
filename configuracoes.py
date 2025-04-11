@@ -56,7 +56,7 @@ tabuleiro_inicial = {
 #Sobre a sidebar.
 
 tam_sidebar = tam_tela_x - tam_tabuleiro #Tamanho inteiro da sidebar.
-tam_peça_sidebar = 45 #Tamanho de cada peça na sidebar.
+tam_peça_sidebar = 60 #Tamanho de cada peça na sidebar.
 tam_fonte_sidebar = 48 #Tamanho dos textos de cada peça na sidebar.
 tam_x_txt_sidebar = 90
 tam_y_txt_sidebar = 54
