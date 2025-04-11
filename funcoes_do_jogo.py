@@ -629,7 +629,7 @@ def desenhar_tela_final(tela, filtro, venceram):
         #Informações sobre o texto sinalizando que é empate.
 
         #Definindo a fonte e o tamanho de todos os textos desenháveis da tela de empate.
-        fonte = pygame.font.SysFont('Ubuntu', 48)
+        fonte = pygame.font.SysFont('Ubuntu', 30)
 
         #Definindo texto informando o empate.
         texto_empate = fonte.render(texto, True, (255, 255, 255))
