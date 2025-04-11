@@ -180,8 +180,6 @@ while usr_jogando:
     #Desenhando as coisas no aplicativo de acordo com a tela do xadrez. O in é usado, pois é possível que a string seja 'xadrez_fim', quando, além da tela ser do xadrez, também é necessário imprimir as informações sobre o fim do jogo.
     elif 'xadrez' in tela_atual:
 
-        # tela_atual = 'xadrez_empate'
-
         #Desenha-se a tela do xadrez com as peças e todo o resto.
         fj.desenhar_xadrez(tela, tabuleiro, info_peças)
 

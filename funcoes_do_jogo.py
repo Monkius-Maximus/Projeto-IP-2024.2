@@ -268,6 +268,14 @@ def eventos_xadrez(tam_tabuleiro, evento, casa_origem, info_peças, vez, sidebar
     #Cria uma variável para armazenar a casa de destino do lance.
     casa_destino = ()
 
+    if evento.type == pygame.KEYDOWN:
+        if evento.key == pygame.K_0:
+            tela_atual = 'xadrez_empate'
+        elif evento.key == pygame.K_1:
+            tela_atual = 'xadrez_brancas_venceram'
+        elif evento.key == pygame.K_2:
+            tela_atual = 'xadrez_pretas_venceram'
+
     #Se o mouse foi clicado.
     if evento.type == pygame.MOUSEBUTTONDOWN:
 
@@ -375,6 +383,8 @@ def eventos_xadrez(tam_tabuleiro, evento, casa_origem, info_peças, vez, sidebar
         #Função para descobrir se a casa de destino deve ser atualizada. Para isso, são necessárias duas coisas. Primeiro, uma casa de origem válida, que é uma peça do usuário já selecinada. Segundo, que ele tenha selecionado, no clique da casa de destino, um lugar para o qual a peça dele pode, efetivamente, ir. Esta função supõe a primeira condição e verifica a segunda.
         def atualizar_destino(casa_origem, casa_clicada, info_peças, vez, tam_tabuleiro, sidebar_contagem):
 
+            tela_atual = 'xadrez'
+
             #Função para encontrar a peça atualmente selecionada.
             def encontrar_peça_selecionada(casa_origem, info_peças, vez):
                 
@@ -468,7 +478,7 @@ def eventos_xadrez(tam_tabuleiro, evento, casa_origem, info_peças, vez, sidebar
                 #Troca a vez do jogador.
                 vez = 'pretas' if vez == 'brancas' else 'brancas'
 
-            return vez
+            return vez, tela_atual
 
         casa_clicada = encontrando_linha_coluna(tam_tabuleiro, pos_x, pos_y)
 
@@ -487,7 +497,7 @@ def eventos_xadrez(tam_tabuleiro, evento, casa_origem, info_peças, vez, sidebar
             if not(foi_atualizada) and casa_origem != ():
                 
                 #Atualizando a casa de destino, se isso for necessário. Se uma casa de destino válida foi selecionada, então a peça será movida.
-                vez = atualizar_destino(casa_origem, casa_clicada, info_peças, vez, tam_tabuleiro, sidebar_contagem)
+                vez, tela_atual = atualizar_destino(casa_origem, casa_clicada, info_peças, vez, tam_tabuleiro, sidebar_contagem)
             
                 #Seja a peça movida (tentativa válida) ou não (tentativa inválida), a casa de origem é zerada para uma nova seleção.
                 casa_origem = ()
@@ -522,6 +532,7 @@ def eventos_tela_final(tela_atual, evento):
         #Enter.
 
         elif evento.key == pygame.K_RETURN:
+            
 
             tela_atual = 'xadrez'
 
@@ -580,8 +591,8 @@ def desenhar_sidebar_contagem(tela, sidebar_contagem):
 #Função para desenhar a tela final do jogo (Empate ou se alguém venceu).
 def desenhar_tela_final(tela, filtro, venceram):
 
-    #Função para desenhar a tela final em caso de empate.
-    def desenhar_empate(tela):
+    #Função para desenhar a tela final em caso de empate ou quando alguém venceu.
+    def desenhar_fim(tela, texto):
         
         #Informações sobre o texto sinalizando que é empate.
 
@@ -589,7 +600,7 @@ def desenhar_tela_final(tela, filtro, venceram):
         fonte = pygame.font.SysFont('Ubuntu', 48)
 
         #Definindo texto informando o empate.
-        texto_empate = fonte.render('Empate!', True, (255, 255, 255))
+        texto_empate = fonte.render(texto, True, (255, 255, 255))
 
         #Definindo a posição do texto informando o empate na tela.
         tela_x, tela_y = tela.get_size()
@@ -634,22 +645,18 @@ def desenhar_tela_final(tela, filtro, venceram):
         tela.blit(texto_novo_jogo, pos_texto_novo_jogo)
         tela.blit(texto_sair, pos_texto_sair)
 
-    #Função para desenhar a tela final em caso de um grupo que venceu.
-    def desenhar_venceram(tela, venceram):
-        pass
-
     #Desenha o filtro na tela. Independente de se for empate ou se alguém venceu, isso é necessário.
     tela.blit(filtro, (0, 0))
 
     #Se a tela for uma tela de empate.
     if venceram == '':
 
-        desenhar_empate(tela)
+        desenhar_fim(tela, 'Empate!')
 
     #Se a tela for uma tela de alguém que venceu.
     else:
 
-        desenhar_venceram(tela, venceram)
+        desenhar_fim(tela, f'{venceram.capitalize()} venceram!')
 
 #Função que define as informações iniciais sobre as peças em cada casa. O dicionário é passado porque, para cada peça, é necessário saber qual é o png associado a ela de acordo com seu tipo.
 def definir_peças(dict_icons, tam_tabuleiro):
