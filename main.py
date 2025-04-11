@@ -147,6 +147,9 @@ casa_destino = ()
 #Variável armazenando de quem é a vez no jogo.
 vez = 'brancas'
 
+movimentos_destacados = []
+
+
 #Loop principal do jogo.
 while usr_jogando:
 
@@ -178,7 +181,9 @@ while usr_jogando:
         elif tela_atual == 'xadrez':
 
             #Eventos da tela do xadrez são resolvidos e a tela atual é atualizada. A casa de destino não é enviada como parâmetro, pois, ela sempre será vazia ao checar novos eventos.
-           tela_atual, casa_origem, info_peças, vez = fj.eventos_xadrez(tam_tabuleiro, evento, casa_origem, info_peças, vez, sidebar_contagem)
+           tela_atual, casa_origem, info_peças, vez = fj.eventos_xadrez(
+           tam_tabuleiro, evento, casa_origem, info_peças, vez, sidebar_contagem, movimentos_destacados
+           )
 
            #Para caso ocorra uma das duas principais possibilidades de empate
            if casa_origem == () and 'brancas' in info_peças and 'pretas' in info_peças:
@@ -200,7 +205,7 @@ while usr_jogando:
     elif 'xadrez' in tela_atual:
 
         #Desenha-se a tela do xadrez com as peças e todo o resto.
-        fj.desenhar_xadrez(tela, tabuleiro, info_peças)
+        fj.desenhar_xadrez(tela, tabuleiro, info_peças, movimentos_destacados)
 
         #Desenha-se a sidebar do xadrez, no que se diz respeito aos contadoress.
         fj.desenhar_sidebar_contagem(tela, sidebar_contagem)
@@ -220,3 +225,4 @@ while usr_jogando:
 
     #Atualiza a tela desde as últimas alterações.
     pygame.display.update()
+    

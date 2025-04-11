@@ -271,13 +271,9 @@ def eventos_menu(evento, jogar_rect, dict_icons, tam_tabuleiro, sidebar_contagem
 
     return tela_atual, info_peças, vez, sidebar_contagem
 
-#Função para lidar com os eventos da tela de xadrez. Ela recebe o evento que ocorreu, uma variável que armazena se já há uma casa clicada e outra variável armazenando de quem é a vez no jogo.
-def eventos_xadrez(tam_tabuleiro, evento, casa_origem, info_peças, vez, sidebar_contagem):
+def eventos_xadrez(tam_tabuleiro, evento, casa_origem, info_peças, vez, sidebar_contagem, movimentos_destacados):
 
-    #Quando se verifica um evento da tela xadrez, a tela atual é o xadrez. Mas, poderá mudar, caso o usuário tenha decidido mudar de tela. Exemplo: voltando para o menu.
     tela_atual = 'xadrez'
-
-    #Cria uma variável para armazenar a casa de destino do lance.
     casa_destino = ()
 
     if evento.type == pygame.KEYDOWN:
@@ -288,61 +284,57 @@ def eventos_xadrez(tam_tabuleiro, evento, casa_origem, info_peças, vez, sidebar
         elif evento.key == pygame.K_2:
             tela_atual = 'xadrez_pretas_venceram'
 
-    #Se o mouse foi clicado.
     if evento.type == pygame.MOUSEBUTTONDOWN:
-
-        #Capta a posição x e y do clique do mouse.
         pos_x, pos_y = evento.pos
 
-        #Função para encontrar a linha e a coluna do clique do jogador.
         def encontrando_linha_coluna(tam_tabuleiro, pos_x, pos_y):
-            
-            #Resposta da função começa vazia.
-            resposta = None
-
-            #Se o clique foi dentro do tabuleiro, identifica e retorna linha e coluna da casa clicada.
             if pos_x <= tam_tabuleiro and pos_y <= tam_tabuleiro:
+                linha = 7 - int(pos_y // (tam_tabuleiro / 8))
+                coluna = int(pos_x // (tam_tabuleiro / 8))
+                return (linha, coluna)
+            return False
 
-                #Identificando qual foi a linha da casa selecionada.
-                encontrou_linha = False
-                pos_teste_y = (tam_tabuleiro / 8)
-                linha = 7
+        casa_clicada = encontrando_linha_coluna(tam_tabuleiro, pos_x, pos_y)
 
-                while not(encontrou_linha):
+        if casa_clicada:
 
-                    if pos_teste_y >= pos_y:
+            if casa_origem == ():
+                # Primeira seleção: origem
+                for peça in info_peças[vez]:
+                    if peça.casa == casa_clicada:
+                        casa_origem = casa_clicada
+                        movimentos = peça.movimentos_possíveis(info_peças)
+                        movimentos = peça.rem_lances_inválidos(info_peças, movimentos)
+                        movimentos_destacados.clear()
+                        movimentos_destacados.extend(movimentos)
+                        break
 
-                        encontrou_linha = True
-
-                    else:
-
-                        linha -= 1
-                        pos_teste_y += tam_tabuleiro / 8
-
-                #Identificando qual foi a coluna da casa selecionada.
-                encontrou_coluna = False
-                pos_teste_x = (tam_tabuleiro / 8)
-                coluna = 0
-
-                while not(encontrou_coluna):
-
-                    if pos_teste_x >= pos_x:
-
-                        encontrou_coluna = True
-                    
-                    else:
-                        
-                        coluna += 1
-                        pos_teste_x += tam_tabuleiro / 8
-
-                resposta = (linha, coluna)
-
-            #Se o clique foi fora do tabuleiro, retorne False.
             else:
+                # Segunda seleção: destino
+                casa_destino = casa_clicada
 
-                resposta = False
+                peça_selecionada = None
+                for peça in info_peças[vez]:
+                    if peça.casa == casa_origem:
+                        peça_selecionada = peça
+                        break
 
-            return resposta
+                if peça_selecionada:
+                    movimentos = peça_selecionada.movimentos_possíveis(info_peças)
+                    movimentos = peça_selecionada.rem_lances_inválidos(info_peças, movimentos)
+
+                    if casa_destino in movimentos:
+                        # Aqui você pode colocar som de movimento ou captura
+                        peça_selecionada.mover_peça(casa_destino, info_peças, tam_tabuleiro)
+                        peça_selecionada.definir_dando_xeque(info_peças, vez)
+
+                        vez = 'pretas' if vez == 'brancas' else 'brancas'
+
+                casa_origem = ()
+                movimentos_destacados.clear()
+
+        return tela_atual, casa_origem, info_peças, vez
+
 
         #Função para lidar com cliques do mouse na barra lateral do jogo.
         def cliques_barra_lateral(evento):
@@ -576,18 +568,16 @@ def desenhar_menu(tela, capa_menu, jogar, pos_jogar, txt_menu, pos_txt_menu):
     tela.blit(txt_menu, pos_txt_menu)
 
 #Função para fazer os desenhos da tela do xadrez.
-def desenhar_xadrez(tela, tabuleiro, info_peças):
-
-    #Pinta-se o fundo da tela de roxo, eliminando objetos antigos.
+def desenhar_xadrez(tela, tabuleiro, info_peças, movimentos_destacados=[]):
     tela.fill('blue')
-
-    #Desenha-se as coisas na tela.
-
-    #Desenha-se o tabuleiro.
     tela.blit(tabuleiro, (0, 0))
 
-    #Desenham-se as peças em cima do tabuleiro.
+    # Destaque os movimentos possíveis antes de desenhar as peças
+    if movimentos_destacados:
+        desenhar_destacar_movimentos(tela, movimentos_destacados, tabuleiro.get_width())
+
     desenhar_peças(tela, info_peças)
+
 
 #Função para fazer os desenhos da sidebar da contagem de peças.
 def desenhar_sidebar_contagem(tela, sidebar_contagem):
@@ -829,3 +819,11 @@ def material_insuficiente(info_peças):
     return False
 
 
+def desenhar_destacar_movimentos(tela, movimentos, tam_tabuleiro):
+    tam_casa = tam_tabuleiro // 8
+    for linha, coluna in movimentos:
+        x = coluna * tam_casa
+        y = tam_tabuleiro - (linha + 1) * tam_casa
+        rect = pygame.Rect(x, y, tam_casa, tam_casa)
+        pygame.draw.rect(tela, (102, 255, 102), rect, 2)  # verde, espessura 5
+ 
