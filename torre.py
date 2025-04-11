@@ -10,7 +10,7 @@ class Torre(Base):
     movida = False
 
     #Uma função que retorna os lances possíveis a serem feitos pela Torre, de acordo com as posições de todas as outras peças do tabuleiro. Esta função deve ser acionada quando houver uma tentativa de mover essa torre.
-    def movimentos_possíveis(self, info_peças):
+    def movimentos_possíveis(self, info_peças, verificar_roque=None):
         
         linha_atual, coluna_atual = self.casa
         cor_torre = 'brancas' if self.cor in ['branca', 'branco'] else 'pretas'
