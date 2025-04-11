@@ -781,6 +781,8 @@ def esta_em_xeque_mate(info_peças, cor):
 
     return xeque_mate
 
+# Empate por falta de movimentos possíveis (acontece quando o jogador não está em xeque, entranto não tem como se movimentar)
+
 def verificar_empate(info_peças, vez):
     grupo_jogador = info_peças[vez]
     adversario = 'brancas' if vez == 'pretas' else 'pretas'
@@ -798,6 +800,7 @@ def verificar_empate(info_peças, vez):
 
     return True
 
+# Empate por material insuficiente ( ocorre quando se resta apenas há reis e bispos no jogo)
 
 def material_insuficiente(info_peças):
     peças_atuais = info_peças['brancas'] + info_peças['pretas']

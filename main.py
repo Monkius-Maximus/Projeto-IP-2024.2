@@ -173,7 +173,9 @@ while usr_jogando:
            tela_atual, casa_origem, info_peças, vez = fj.eventos_xadrez(
            tam_tabuleiro, evento, casa_origem, info_peças, vez, sidebar_contagem
            )
-
+            
+            #Para caso ocorra uma das duas principais possibilidades de empate
+            
         if casa_origem == () and 'brancas' in info_peças and 'pretas' in info_peças:
          if verificar_empate(info_peças, vez) or material_insuficiente(info_peças):
           tela_atual = 'xadrez_empate'
