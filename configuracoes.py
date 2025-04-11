@@ -7,7 +7,7 @@ tam_tela = tam_tela_x, tam_tela_y = 1100, 800
 #Sobre a tela principal (Menu).
 
 #Nome da janela.
-str_janela_menu = 'Chess CIn'
+str_janela_menu = 'Xadrez do CIn'
 
 #Sobre o título do Menu.
 str_fonte_menu = 'Ubuntu' #Uma string com o nome da fonte do título.
@@ -62,7 +62,7 @@ tam_x_txt_sidebar = 90
 tam_y_txt_sidebar = 54
 distancia_peça_texto = 5
 str_fonte_sidebar = 'Ubuntu'
-cor_txt_sidebar = (0, 0, 0)
+cor_txt_sidebar = (0, 255, 0)
 distancia_tabuleiro = 20 #Distância das peças com relação ao tabuleiro, segundo o eixo horizontal.
 distancia_peças = 10 #Distância das peças entre si, segundo o eixo vertical.
 

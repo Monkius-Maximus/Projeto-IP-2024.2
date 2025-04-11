@@ -29,7 +29,7 @@ def _init_tela():
     y_proporcional = (cfg.tam_tela_y * x_proporcional) / cfg.tam_tela_x
 
     # Cria a janela com o tamanho ajustado.
-    tela = pygame.display.set_mode((x_proporcional, y_proporcional), pygame.RESIZABLE)
+    tela = pygame.display.set_mode((x_proporcional, y_proporcional))
 
     pygame.display.set_caption(cfg.str_janela_menu) #Define título do menu.
 
@@ -582,12 +582,15 @@ def desenhar_menu(tela, capa_menu, jogar, pos_jogar, txt_menu, pos_txt_menu):
     tela.blit(txt_menu, pos_txt_menu)
 
 #Função para fazer os desenhos da tela do xadrez.
-def desenhar_xadrez(tela, tabuleiro, info_peças):
+def desenhar_xadrez(tela, tabuleiro, img_sidebar, info_peças):
 
-    #Pinta-se o fundo da tela de roxo, eliminando objetos antigos.
-    tela.fill('blue')
+    #Pinta-se o fundo da tela de preto, eliminando objetos antigos.
+    tela.fill((0, 0, 0))
 
     #Desenha-se as coisas na tela.
+
+    #Desenha-se Sérgio.
+    tela.blit(img_sidebar, (tabuleiro.get_size()[0], 0))
 
     #Desenha-se o tabuleiro.
     tela.blit(tabuleiro, (0, 0))

@@ -82,6 +82,12 @@ tam_real_sidebar = torre_branca_pequena.get_size()[0]
 capa_menu = pygame.image.load('imagens/capa_menu.jpeg')
 capa_menu = pygame.transform.scale(capa_menu, (tela_x, tela_y))
 
+#Importando a imagem da sidebar.
+img_sidebar = pygame.image.load('imagens/imagem_sidebar.png')
+x_img_sidebar = tela_x - tam_tabuleiro
+y_img_sidebar = tela_y
+img_sidebar = pygame.transform.scale(img_sidebar, (x_img_sidebar, y_img_sidebar))
+
 #Sobre a sidebar (Contadores).
 
 #Inicializa a posição das peças brancas capturadas na sidebar e insere elas em uma lista, assim como os textos correspondentes às capturas. 
@@ -200,7 +206,7 @@ while usr_jogando:
     elif 'xadrez' in tela_atual:
 
         #Desenha-se a tela do xadrez com as peças e todo o resto.
-        fj.desenhar_xadrez(tela, tabuleiro, info_peças)
+        fj.desenhar_xadrez(tela, tabuleiro, img_sidebar, info_peças)
 
         #Desenha-se a sidebar do xadrez, no que se diz respeito aos contadoress.
         fj.desenhar_sidebar_contagem(tela, sidebar_contagem)
