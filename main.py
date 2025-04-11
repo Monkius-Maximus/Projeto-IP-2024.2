@@ -2,8 +2,6 @@ import pygame, os
 import funcoes_do_jogo as fj
 import configuracoes as cfg
 import copy
-from funcoes_do_jogo import verificar_empate, material_insuficiente
-
 
 #Limpa o terminal para fazer impressões.
 os.system('clear')
@@ -17,7 +15,6 @@ som_captura = pygame.mixer.Sound('sons/movimento_peça.mp3')
 #Inicia o mixer do pygame para o jogo ter sons
 
 pygame.mixer.init()
-
 
 #Sobre o menu.
 
@@ -184,12 +181,7 @@ while usr_jogando:
         elif tela_atual == 'xadrez':
 
             #Eventos da tela do xadrez são resolvidos e a tela atual é atualizada. A casa de destino não é enviada como parâmetro, pois, ela sempre será vazia ao checar novos eventos.
-           tela_atual, casa_origem, info_peças, vez = fj.eventos_xadrez(tam_tabuleiro, evento, casa_origem, info_peças, vez, sidebar_contagem)
-
-           #Para caso ocorra uma das duas principais possibilidades de empate
-           if casa_origem == () and 'brancas' in info_peças and 'pretas' in info_peças:
-                if verificar_empate(info_peças, vez) or material_insuficiente(info_peças):
-                    tela_atual = 'xadrez_empate'
+            tela_atual, casa_origem, info_peças, vez = fj.eventos_xadrez(tam_tabuleiro, evento, casa_origem, info_peças, vez, sidebar_contagem)
         
         #Caso a tela atual seja a tela do final do jogo, ou seja, empate ou alguém venceu. Os eventos verificados para essas telas possíveis são os mesmos eventos.
         else:

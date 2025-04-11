@@ -16,7 +16,6 @@ pygame.mixer.init()
 #Função feita para inicializar a tela. É chamada no início do jogo para configurar o menu.
 def _init_tela():
 
-
     #Informações do monitor atual.
     info_monitor = pygame.display.Info()
 
@@ -280,14 +279,6 @@ def eventos_xadrez(tam_tabuleiro, evento, casa_origem, info_peças, vez, sidebar
     #Cria uma variável para armazenar a casa de destino do lance.
     casa_destino = ()
 
-    if evento.type == pygame.KEYDOWN:
-        if evento.key == pygame.K_0:
-            tela_atual = 'xadrez_empate'
-        elif evento.key == pygame.K_1:
-            tela_atual = 'xadrez_brancas_venceram'
-        elif evento.key == pygame.K_2:
-            tela_atual = 'xadrez_pretas_venceram'
-
     #Se o mouse foi clicado.
     if evento.type == pygame.MOUSEBUTTONDOWN:
 
@@ -484,7 +475,7 @@ def eventos_xadrez(tam_tabuleiro, evento, casa_origem, info_peças, vez, sidebar
                     #Som do movimento normal das peças de xadrez pelo tabuleiro
                     pygame.mixer.Sound('sons/movimento_peça.mp3').play()
                 
-                                #Verifica se ela está dando xeque no rei adversário.
+                #Verifica se ela está dando xeque no rei adversário.
                 peça_selecionada.definir_dando_xeque(info_peças, vez)
 
                 #Verifica se o rei adversário está em xeque-mate.
@@ -803,37 +794,3 @@ def esta_em_xeque_mate(info_peças, cor):
             xeque_mate = False
 
     return xeque_mate
-
-# Empate por falta de movimentos possíveis (acontece quando o jogador não está em xeque, entranto não tem como se movimentar)
-
-def verificar_empate(info_peças, vez):
-    grupo_jogador = info_peças[vez]
-    adversario = 'brancas' if vez == 'pretas' else 'pretas'
-
-    rei = next((p for p in grupo_jogador if p.tipo == 'rei'), None)
-    if not rei or rei.em_xeque:
-        return False
-
-    for peça in grupo_jogador:
-        movimentos = peça.movimentos_possíveis(info_peças)
-        movimentos = peça.rem_lances_inválidos(info_peças, movimentos)
-
-        if movimentos:
-            return False
-
-    return True
-
-# Empate por material insuficiente ( ocorre quando se resta apenas há reis e bispos no jogo)
-
-def material_insuficiente(info_peças):
-    peças_atuais = info_peças['brancas'] + info_peças['pretas']
-    tipos = [p.tipo for p in peças_atuais if p.tipo != 'rei']
-
-    if not tipos:
-        return True
-    if len(tipos) == 1 and tipos[0] in ['bispo', 'cavalo']:
-        return True
-
-    return False
-
-
