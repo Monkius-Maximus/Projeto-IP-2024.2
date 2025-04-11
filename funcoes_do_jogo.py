@@ -25,7 +25,7 @@ def _init_tela():
     y_proporcional = (cfg.tam_tela_y * x_proporcional) / cfg.tam_tela_x
 
     # Cria a janela com o tamanho ajustado.
-    tela = pygame.display.set_mode((x_proporcional, y_proporcional))
+    tela = pygame.display.set_mode((x_proporcional, y_proporcional), pygame.RESIZABLE)
 
     pygame.display.set_caption(cfg.str_janela_menu) #Define título do menu.
 
@@ -231,19 +231,19 @@ def importar_peças(peça_png, tabuleiro):
     caminho = 'imagens/peças/'
 
     #Transforma o png de cada peça em uma superfície para desenhar no programa.
-    peça = pygame.image.load(f'{caminho}{peça_png}')
+    peça_original = pygame.image.load(f'{caminho}{peça_png}')
 
     #Redimensiona a superfície para um tamanho razoável da peça normal considerando o tamanho real de cada casa.
     
     tam_real_casa = tabuleiro.get_size()[0]/8 #Cada casa possui o tamanho de uma linha do tabuleiro dividido por 8, pois uma linha tem 8 casas.
     tam_peça_redim = (cfg.tam_peça * tam_real_casa) / cfg.tam_casa
 
-    peça = pygame.transform.scale(peça, (tam_peça_redim, tam_peça_redim))
+    peça = pygame.transform.smoothscale(peça_original, (tam_peça_redim, tam_peça_redim))
     
     #Cria uma versão menor da peça para ser usada na sidebar. Redimensiona seu tamanho com base no tamanho real da peça, conforme a resolução do monitor.
     tam_peça_sidebar_redim = (cfg.tam_peça_sidebar * tam_peça_redim) / cfg.tam_peça
 
-    peça_pequena = pygame.transform.scale(peça, (tam_peça_sidebar_redim, tam_peça_sidebar_redim))
+    peça_pequena = pygame.transform.smoothscale(peça_original, (tam_peça_sidebar_redim, tam_peça_sidebar_redim))
 
     return peça, peça_pequena
 
@@ -416,6 +416,45 @@ def eventos_xadrez(tam_tabuleiro, evento, casa_origem, info_peças, vez, sidebar
             movimentos_possíveis = peça_selecionada.movimentos_possíveis(info_peças) #Define movimentos possíveis desconsiderando xeque do próprio rei
             movimentos_possíveis = peça_selecionada.rem_lances_inválidos(info_peças, movimentos_possíveis) #Restringe os movimentos possíveis aos que não deixam o rei em xeque.
 
+            tipo_roque = None
+            movimento_valido = False
+
+            # Verifica se o movimento é possível
+            for mov in movimentos_possíveis:
+                if isinstance(mov, tuple) and mov[0] == casa_clicada:
+                    # Movimento de roque
+                    movimento_valido = True
+                    tipo_roque = mov[1]
+                    break
+                elif mov == casa_clicada:
+                    # Movimento normal
+                    movimento_valido = True
+                    break
+
+            if movimento_valido:
+                # Move o rei
+                peça_selecionada.mover_peça(casa_clicada, info_peças, tam_tabuleiro)
+                peça_selecionada.movida = True
+
+                # Lógica do Roque
+                if peça_selecionada.tipo == 'rei' and tipo_roque:
+                    grupo = info_peças[vez]
+                    linha = casa_origem[0]
+
+                    if tipo_roque == 'pequeno':
+                        for p in grupo:
+                            if p.tipo == 'torre' and p.casa == (linha, 7):
+                                p.mover_peça((linha, 5), info_peças, tam_tabuleiro)
+                                p.movida = True
+                                break
+
+                    elif tipo_roque == 'grande':
+                        for p in grupo:
+                            if p.tipo == 'torre' and p.casa == (linha, 0):
+                                p.mover_peça((linha, 3), info_peças, tam_tabuleiro)
+                                p.movida = True
+                                break
+
             #Se o lance tentado para esta peça é lícito.
             if casa_clicada in movimentos_possíveis:
                 
@@ -423,6 +462,7 @@ def eventos_xadrez(tam_tabuleiro, evento, casa_origem, info_peças, vez, sidebar
                 peça_selecionada.mover_peça(casa_clicada, info_peças, tam_tabuleiro)
 
                 #Se o usuário de alguma cor acabou de se mover, então é certo que o rei dele não está mais em xeque, pelas regras. Portanto, o elemento em_xeque do rei dele se torna False, e os elementos dando_xeque das peças opostas se tornam todos False.
+                movimento_valido = False
 
                 #Verifica se ela está dando xeque no rei adversário.
                 peça_selecionada.definir_dando_xeque(info_peças, vez)
