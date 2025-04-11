@@ -528,7 +528,7 @@ def eventos_xadrez(tam_tabuleiro, evento, casa_origem, info_peças, vez, sidebar
 
 #Função para lidar com os eventos da tela final (quando deu empate ou alguém venceu a partida).
 def eventos_tela_final(tela_atual, evento, dict_icons, tam_tabuleiro, info_peças, vez, sidebar_contagem, tam_real_sidebar):
-
+    print('estou aqui')
     #Se uma tecla foi clicada.
     if evento.type == pygame.KEYDOWN:
         

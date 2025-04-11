@@ -178,21 +178,18 @@ while usr_jogando:
         elif tela_atual == 'xadrez':
 
             #Eventos da tela do xadrez são resolvidos e a tela atual é atualizada. A casa de destino não é enviada como parâmetro, pois, ela sempre será vazia ao checar novos eventos.
-           tela_atual, casa_origem, info_peças, vez = fj.eventos_xadrez(
-           tam_tabuleiro, evento, casa_origem, info_peças, vez, sidebar_contagem
-           )
-            
-            #Para caso ocorra uma das duas principais possibilidades de empate
+           tela_atual, casa_origem, info_peças, vez = fj.eventos_xadrez(tam_tabuleiro, evento, casa_origem, info_peças, vez, sidebar_contagem)
 
-        if casa_origem == () and 'brancas' in info_peças and 'pretas' in info_peças:
-         if verificar_empate(info_peças, vez) or material_insuficiente(info_peças):
-          tela_atual = 'xadrez_empate'
+           #Para caso ocorra uma das duas principais possibilidades de empate
+           if casa_origem == () and 'brancas' in info_peças and 'pretas' in info_peças:
+                if verificar_empate(info_peças, vez) or material_insuficiente(info_peças):
+                    tela_atual = 'xadrez_empate'
         
         #Caso a tela atual seja a tela do final do jogo, ou seja, empate ou alguém venceu. Os eventos verificados para essas telas possíveis são os mesmos eventos.
         else:
             
             tela_atual, info_peças, vez, sidebar_contagem = fj.eventos_tela_final(tela_atual, evento, dict_icons, tam_tabuleiro, info_peças, vez, sidebar_contagem, tam_real_sidebar)
-    
+
     #Desenhando as coisas no aplicativo de acordo com a tela do menu.
     if tela_atual == 'menu':
 
