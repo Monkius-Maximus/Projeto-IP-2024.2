@@ -419,42 +419,6 @@ def eventos_xadrez(tam_tabuleiro, evento, casa_origem, info_peças, vez, sidebar
             tipo_roque = None
             movimento_valido = False
 
-            # Verifica se o movimento é possível
-            for mov in movimentos_possíveis:
-                if isinstance(mov, tuple) and mov[0] == casa_clicada:
-                    # Movimento de roque
-                    movimento_valido = True
-                    tipo_roque = mov[1]
-                    break
-                elif mov == casa_clicada:
-                    # Movimento normal
-                    movimento_valido = True
-                    break
-
-            if movimento_valido:
-                # Move o rei
-                peça_selecionada.mover_peça(casa_clicada, info_peças, tam_tabuleiro)
-                peça_selecionada.movida = True
-
-                # Lógica do Roque
-                if peça_selecionada.tipo == 'rei' and tipo_roque:
-                    grupo = info_peças[vez]
-                    linha = casa_origem[0]
-
-                    if tipo_roque == 'pequeno':
-                        for p in grupo:
-                            if p.tipo == 'torre' and p.casa == (linha, 7):
-                                p.mover_peça((linha, 5), info_peças, tam_tabuleiro)
-                                p.movida = True
-                                break
-
-                    elif tipo_roque == 'grande':
-                        for p in grupo:
-                            if p.tipo == 'torre' and p.casa == (linha, 0):
-                                p.mover_peça((linha, 3), info_peças, tam_tabuleiro)
-                                p.movida = True
-                                break
-
             #Se o lance tentado para esta peça é lícito.
             if casa_clicada in movimentos_possíveis:
                 
@@ -506,7 +470,8 @@ def eventos_xadrez(tam_tabuleiro, evento, casa_origem, info_peças, vez, sidebar
                         for tipo_peça, elementos_texto in sidebar_contagem['textos'][grupo_cor_oposta].items():
 
                             if tipo_peça == peça_oposta.tipo + '_' + peça_oposta.cor:
-
+                                
+                                tam_txt_x, tam_txt_y = elementos_texto[0].get_size()
                                 texto_atual = elementos_texto[2] #Texto atual que está sendo desenhado, que representa a quantidade de vezes que a peça foi capturada.
                                 num_atual = int(texto_atual.split(' -> ')[1]) #Pega só o número.
                                 num_atual += 1 #Soma em 1, pois uma peça desse tipo foi capturada.
@@ -515,6 +480,7 @@ def eventos_xadrez(tam_tabuleiro, evento, casa_origem, info_peças, vez, sidebar
                                 #Gera uma nova fonte e superfície com base no novo texto.
                                 fonte_título = pygame.font.SysFont(cfg.str_fonte_sidebar, cfg.tam_fonte_sidebar)
                                 txt_sidebar = fonte_título.render(texto_atual, True, cfg.cor_txt_sidebar)
+                                txt_sidebar = pygame.transform.scale(txt_sidebar, (tam_txt_x, tam_txt_y))
 
                                 #Atualiza a superfície para comportar o texto com o novo valor de captura.
                                 sidebar_contagem['textos'][grupo_cor_oposta][tipo_peça][0] = txt_sidebar
