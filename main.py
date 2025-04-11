@@ -52,6 +52,19 @@ txt_jogar, pos_txt_jogar = fj._init_txt_jogar(jogar)
 #Colocando o texto 'Jogar' na superfície do botão Jogar.
 jogar.blit(txt_jogar, pos_txt_jogar) #Desenha o texto 'Jogar' no botão Jogar.
 
+# Aqui vamos carregar a música de fundo por enquanto só o de loop
+musica_fundo = pygame.mixer.Sound('sons/musica_fundo.mp3')
+
+# música de fundo está tocando ou não
+musica_tocando = False
+
+# Se a música de fundo não estiver tocando e o jogo não estiver terminado
+if tela_atual == 'menu':
+        # Toca a música de fundo em loop
+        musica_fundo.play(loops=-1)
+        # Define a variável para indicar que a música está tocando
+        musica_tocando = True
+
 #Sobre a tela do xadrez.
 
 #Importando o tabuleiro.
