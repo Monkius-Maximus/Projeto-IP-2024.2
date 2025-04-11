@@ -27,6 +27,7 @@ class Base:
         #Atualiza a casa da peça e a posição conforme o tabuleiro.
         self.casa = nova_casa
         self.pos = self.descobrir_pos(nova_casa, tam_tabuleiro)
+        self.movida = True
 
     #Função para verificar se a peça atual está dando xeque no rei adversário. Naturalmente, esse método será inútil para o rei, pois ele não pode dar xeque no rei adversário.
     def definir_dando_xeque(self, info_peças, vez, simulação=False,daria_xeque=False):

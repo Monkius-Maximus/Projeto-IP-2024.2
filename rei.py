@@ -21,6 +21,7 @@ class Rei(Base):
 
         # Verificação de roque (somente se permitido)
         if verificar_roque and not self.movida and not self.em_xeque:
+            # print(f'{self.movida} -> {self.tipo}, {self.cor}')
             cor_rei = 'brancas' if self.cor in ['branca', 'branco'] else 'pretas'
             linha_inicial = 0 if cor_rei == 'brancas' else 7
             inimigos = info_peças['pretas'] if cor_rei == 'brancas' else info_peças['brancas']
@@ -39,14 +40,13 @@ class Rei(Base):
         # Atualiza a casa do rei normalmente
         self.casa = nova_casa
         self.pos = self.descobrir_pos(nova_casa, tam_tabuleiro)
-        self.movida = True
 
         # Verifica se é um roque
         cor_rei = 'brancas' if self.cor in ['branca', 'branco'] else 'pretas'
         linha = 0 if cor_rei == 'brancas' else 7
 
         # Roque pequeno (rei foi para coluna 6)
-        if nova_casa == (linha, 6):
+        if nova_casa == (linha, 6) and not self.movida:
             torre = next(
                 (p for p in info_peças[cor_rei] if p.tipo == 'torre' and p.casa == (linha, 7)),
                 None
@@ -55,13 +55,15 @@ class Rei(Base):
                 torre.mover_peça((linha, 5), info_peças, tam_tabuleiro)
 
         # Roque grande (rei foi para coluna 2)
-        elif nova_casa == (linha, 2):
+        elif nova_casa == (linha, 2) and not self.movida:
             torre = next(
                 (p for p in info_peças[cor_rei] if p.tipo == 'torre' and p.casa == (linha, 0)),
                 None
             )
             if torre:
                 torre.mover_peça((linha, 3), info_peças, tam_tabuleiro)
+
+        self.movida = True
 
     def pode_fazer_roque(self, info_peças, inimigos, linha, *colunas_caminho, torre_coluna):
         """
@@ -110,10 +112,6 @@ class Rei(Base):
                 for peça in info_peças[grupo_cor]:
                     if peça.casa == nova_casa:
                         
-                        if peça.casa == (6, 5):
-
-                            print(f'Peça: {peça.tipo}')
-
                         cor_rei = 'brancas' if self.cor in ['branca', 'branco'] else 'pretas'
                         cor_peça_esbarrada = 'brancas' if peça.cor in ['branca', 'branco'] else 'pretas'
 
