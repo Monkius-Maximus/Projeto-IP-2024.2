@@ -6,7 +6,7 @@ class Rainha(Base):
     
     tipo = 'rainha'
     
-    def movimentos_possíveis(self, info_peças):
+    def movimentos_possíveis(self, info_peças, verificar_roque=None):
         
         linha_atual, coluna_atual = self.casa
         cor_rainha = self.cor
@@ -38,8 +38,14 @@ class Rainha(Base):
                     esbarrou = True
                     
                     # Se for uma peça adversária, pode capturar.
-                    if esbarrou_peça and casas_ocupadas[(nova_linha, nova_coluna)].cor != cor_rainha:
-                        movimentos_possíveis.append((nova_linha, nova_coluna))
+                    if esbarrou_peça:
+
+                        cor_rainha_real = 'brancas' if cor_rainha in ['branco', 'branca'] else 'pretas'
+                        cor_esbarrada_real = 'brancas' if casas_ocupadas[(nova_linha, nova_coluna)].cor in ['branco', 'branca'] else 'pretas'
+
+                        if cor_rainha_real != cor_esbarrada_real:
+                            
+                            movimentos_possíveis.append((nova_linha, nova_coluna))
                 
                 else:
                     movimentos_possíveis.append((nova_linha, nova_coluna))

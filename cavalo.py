@@ -5,7 +5,7 @@ class Cavalo(Base):
 
     tipo = 'cavalo'
 
-    def movimentos_possíveis(self, info_peças):
+    def movimentos_possíveis(self, info_peças, verificar_roque=None):
 
         linha_atual, coluna_atual = self.casa
         cor_cavalo = self.cor

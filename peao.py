@@ -7,7 +7,7 @@ class Peão(Base):
     
     tipo = 'peão'
     
-    def movimentos_possíveis(self, info_peças):
+    def movimentos_possíveis(self, info_peças, verificar_roque=None):
         linha_atual, coluna_atual = self.casa
         cor_peão = self.cor
         movimentos_possíveis = []

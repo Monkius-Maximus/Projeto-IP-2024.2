@@ -19,7 +19,7 @@ cor_menu = (0, 0, 0) #Define a cor do título do menu como azul.
 
 #Sobre o botão de Jogar. Definindo tamanho, cor e posição do botão Jogar.
 tam_jogar = tam_jogar_x, tam_jogar_y = 300, 100 #Define o tamanho do botão. Ordem: largura e comprimento.
-cor_jogar = (255, 0, 0) #Define que a cor do botão 'Jogar' será vermelha.
+cor_jogar = (255, 255, 255) #Define que a cor do botão 'Jogar' será vermelha.
 
 #Sobre o texto do botão jogar. Definindo string, cor e fonte.
 str_jogar = 'Jogar'
@@ -58,6 +58,9 @@ tabuleiro_inicial = {
 tam_sidebar = tam_tela_x - tam_tabuleiro #Tamanho inteiro da sidebar.
 tam_peça_sidebar = 45 #Tamanho de cada peça na sidebar.
 tam_fonte_sidebar = 48 #Tamanho dos textos de cada peça na sidebar.
+tam_x_txt_sidebar = 90
+tam_y_txt_sidebar = 54
+distancia_peça_texto = 5
 str_fonte_sidebar = 'Ubuntu'
 cor_txt_sidebar = (0, 0, 0)
 distancia_tabuleiro = 20 #Distância das peças com relação ao tabuleiro, segundo o eixo horizontal.

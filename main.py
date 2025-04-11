@@ -1,12 +1,23 @@
 import pygame, os
 import funcoes_do_jogo as fj
 import configuracoes as cfg
+import copy
+from funcoes_do_jogo import verificar_empate, material_insuficiente
+
 
 #Limpa o terminal para fazer impressões.
 os.system('clear')
 
 #Inicializa os módulos do Pygame.
 pygame.init()
+
+#Som da peça sendo movida
+som_captura = pygame.mixer.Sound('sons/movimento_peça.mp3')
+
+#Inicia o mixer do pygame para o jogo ter sons
+
+pygame.mixer.init()
+
 
 #Sobre o menu.
 
@@ -65,6 +76,12 @@ rainha_branca, rainha_branca_pequena = fj.importar_peças('rainha_branca.png', t
 rei_branco = fj.importar_peças('rei_branco.png', tabuleiro)[0]
 peão_branco, peão_branco_pequeno = fj.importar_peças('peao_branco.png', tabuleiro)
 
+tam_real_sidebar = torre_branca_pequena.get_size()[0]
+
+#Importando a capa do menu.
+capa_menu = pygame.image.load('imagens/capa_menu.jpeg')
+capa_menu = pygame.transform.scale(capa_menu, (tela_x, tela_y))
+
 #Sobre a sidebar (Contadores).
 
 #Inicializa a posição das peças brancas capturadas na sidebar e insere elas em uma lista, assim como os textos correspondentes às capturas. 
@@ -78,7 +95,7 @@ brancas_capturadas = fj._init_brancas_capturadas(torre_branca_pequena,
                                                  torre_preta_pequena.get_size()[1])
 
 #Inicializar os textos das brancas capturadas na sidebar, com base na posição das brancas capturadas.
-textos_brancas = fj._init_textos(brancas_capturadas)
+textos_brancas = fj._init_textos(brancas_capturadas, tam_real_sidebar)
 
 #Inicializa a posição das peças pretas capturadas na sidebar e insere elas em uma lista, assim como os textos correspondentes às capturas. 
 pretas_capturadas = fj._init_pretas_capturadas(torre_preta_pequena,
@@ -91,7 +108,7 @@ pretas_capturadas = fj._init_pretas_capturadas(torre_preta_pequena,
                                                torre_preta_pequena.get_size()[1])
 
 #Inicializar os textos das brancas capturadas na sidebar, com base na posição das brancas capturadas.
-textos_pretas = fj._init_textos(pretas_capturadas)
+textos_pretas = fj._init_textos(pretas_capturadas, tam_real_sidebar)
 
 #Junta as informações numa estrutura de dados só, para simplificar.
 sidebar_contagem = {
@@ -155,29 +172,32 @@ while usr_jogando:
         elif tela_atual == 'menu':
 
             #Eventos de menu são resolvidos e a tela atual é atualizada. Além disso, quando o usuário apertar em 'Jogar', as informações sobre as peças são adicionadas na variável info_peças. Para isso, é necessário o uso da biblioteca dict_icons, para associar cada peça ao seu png. O retângulo do botão de jogar é passado para saber se o usuário clicou no botão.
-            tela_atual, info_peças = fj.eventos_menu(evento, jogar.get_rect(topleft=pos_jogar), dict_icons, tam_tabuleiro)
+            tela_atual, info_peças, vez, sidebar_contagem = fj.eventos_menu(evento, jogar.get_rect(topleft=pos_jogar), dict_icons, tam_tabuleiro, sidebar_contagem, tam_real_sidebar)
 
         #Se a tela for do jogo de xadrez e se não for a tela do fim (empate ou ganhar), lida-se com os eventos interessantes que a tela do xadrez pode receber. Por isso o comparativo do == é usado neste caso.
         elif tela_atual == 'xadrez':
 
             #Eventos da tela do xadrez são resolvidos e a tela atual é atualizada. A casa de destino não é enviada como parâmetro, pois, ela sempre será vazia ao checar novos eventos.
-            tela_atual, casa_origem, info_peças, vez = fj.eventos_xadrez(tam_tabuleiro, evento, casa_origem, info_peças, vez, sidebar_contagem)
+           tela_atual, casa_origem, info_peças, vez = fj.eventos_xadrez(tam_tabuleiro, evento, casa_origem, info_peças, vez, sidebar_contagem)
+
+           #Para caso ocorra uma das duas principais possibilidades de empate
+           if casa_origem == () and 'brancas' in info_peças and 'pretas' in info_peças:
+                if verificar_empate(info_peças, vez) or material_insuficiente(info_peças):
+                    tela_atual = 'xadrez_empate'
         
         #Caso a tela atual seja a tela do final do jogo, ou seja, empate ou alguém venceu. Os eventos verificados para essas telas possíveis são os mesmos eventos.
         else:
             
-            tela_atual = fj.eventos_tela_final(tela_atual, evento)
-    
+            tela_atual, info_peças, vez, sidebar_contagem = fj.eventos_tela_final(tela_atual, evento, dict_icons, tam_tabuleiro, info_peças, vez, sidebar_contagem, tam_real_sidebar)
+
     #Desenhando as coisas no aplicativo de acordo com a tela do menu.
     if tela_atual == 'menu':
 
         #Desenha-se o menu com o título principal e o botão de jogar.
-        fj.desenhar_menu(tela, jogar, pos_jogar, txt_menu, pos_txt_menu)
+        fj.desenhar_menu(tela, capa_menu, jogar, pos_jogar, txt_menu, pos_txt_menu)
 
     #Desenhando as coisas no aplicativo de acordo com a tela do xadrez. O in é usado, pois é possível que a string seja 'xadrez_fim', quando, além da tela ser do xadrez, também é necessário imprimir as informações sobre o fim do jogo.
     elif 'xadrez' in tela_atual:
-
-        # tela_atual = 'xadrez_empate'
 
         #Desenha-se a tela do xadrez com as peças e todo o resto.
         fj.desenhar_xadrez(tela, tabuleiro, info_peças)
