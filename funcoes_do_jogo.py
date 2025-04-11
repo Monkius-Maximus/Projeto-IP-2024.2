@@ -240,7 +240,7 @@ def importar_peças(peça_png, tabuleiro):
     return peça, peça_pequena
 
 #Função para lidar com os eventos do menu. Info_peças começa sendo um dicionário vazio, pois ainda estamos no menu e o usuário ainda não escolheu jogar.
-def eventos_menu(evento, jogar_rect, dict_icons, tam_tabuleiro, info_peças = {}):
+def eventos_menu(evento, jogar_rect, dict_icons, tam_tabuleiro, sidebar_contagem, info_peças = {}, vez = ''):
 
     #Quando se verifica um evento da tela menu, a tela atual é o menu. Mas, poderá mudar, caso o usuário tenha decidido mudar de tela. Exemplo: decidindo jogar o xadrez
     tela_atual = 'menu'
@@ -255,9 +255,9 @@ def eventos_menu(evento, jogar_rect, dict_icons, tam_tabuleiro, info_peças = {}
             tela_atual = 'xadrez'
 
             #Como o usuário está começando a jogar agora, é necessário definir as informações iniciais das peças do tabuleiro.
-            info_peças = definir_peças(dict_icons, tam_tabuleiro)
+            info_peças, vez, sidebar_contagem = iniciar_novo_jogo(dict_icons, tam_tabuleiro, sidebar_contagem)
 
-    return tela_atual, info_peças
+    return tela_atual, info_peças, vez, sidebar_contagem
 
 #Função para lidar com os eventos da tela de xadrez. Ela recebe o evento que ocorreu, uma variável que armazena se já há uma casa clicada e outra variável armazenando de quem é a vez no jogo.
 def eventos_xadrez(tam_tabuleiro, evento, casa_origem, info_peças, vez, sidebar_contagem):
@@ -433,7 +433,6 @@ def eventos_xadrez(tam_tabuleiro, evento, casa_origem, info_peças, vez, sidebar
                             if xeque_mate:
 
                                 tela_atual = 'xadrez_' + vez + '_venceram'
-                                print(tela_atual)
 
                 #Se for uma torre ou um rei, e a peça ainda não tiver sido movida, a informação é atualizada. Isso é importante para verificar questões de roque.
                 if peça_selecionada.tipo in ['rei', 'torre']:
@@ -505,7 +504,7 @@ def eventos_xadrez(tam_tabuleiro, evento, casa_origem, info_peças, vez, sidebar
     return tela_atual, casa_origem, info_peças, vez
 
 #Função para lidar com os eventos da tela final (quando deu empate ou alguém venceu a partida).
-def eventos_tela_final(tela_atual, evento):
+def eventos_tela_final(tela_atual, evento, dict_icons, tam_tabuleiro, info_peças, vez, sidebar_contagem):
 
     #Se uma tecla foi clicada.
     if evento.type == pygame.KEYDOWN:
@@ -532,11 +531,11 @@ def eventos_tela_final(tela_atual, evento):
         #Enter.
 
         elif evento.key == pygame.K_RETURN:
-            
 
             tela_atual = 'xadrez'
+            info_peças, vez, sidebar_contagem = iniciar_novo_jogo(dict_icons, tam_tabuleiro, sidebar_contagem)
 
-    return tela_atual
+    return tela_atual, info_peças, vez, sidebar_contagem
 
 #Função para fazer os desenhos da tela menu.
 def desenhar_menu(tela, jogar, pos_jogar, txt_menu, pos_txt_menu):
@@ -658,79 +657,94 @@ def desenhar_tela_final(tela, filtro, venceram):
 
         desenhar_fim(tela, f'{venceram.capitalize()} venceram!')
 
-#Função que define as informações iniciais sobre as peças em cada casa. O dicionário é passado porque, para cada peça, é necessário saber qual é o png associado a ela de acordo com seu tipo.
-def definir_peças(dict_icons, tam_tabuleiro):
+#Função que inicia um novo jogo. Define as informações iniciais sobre as peças em cada casa, define a vez das peças como sendo as brancas e reinicia a side-bar. O dicionário é passado porque, para cada peça, é necessário saber qual é o png associado a ela de acordo com seu tipo.
+def iniciar_novo_jogo(dict_icons, tam_tabuleiro, sidebar_contagem):
 
-    #Dicionário que irá armazenar informações sobre as peças (objetos das classes). 
-    info_peças = {
-        'pretas' : [],
-        'brancas' : []
-    }
+    def posições_iniciais_peças():
 
-    #Dicionário que mapeia a cor da peça individual ('preto', 'preta', 'branco', 'branca') para a string que representa o grupo a que pertence 'pretas' ou 'brancas'.
-    cor_info = {
-        'preta' : 'pretas',
-        'preto' : 'pretas',
+        #Dicionário que irá armazenar informações sobre as peças (objetos das classes). 
+        info_peças = {
+            'pretas' : [],
+            'brancas' : []
+        }
 
-        'branca' : 'brancas',
-        'branco' : 'brancas'
-    }
+        #Dicionário que mapeia a cor da peça individual ('preto', 'preta', 'branco', 'branca') para a string que representa o grupo a que pertence 'pretas' ou 'brancas'.
+        cor_info = {
+            'preta' : 'pretas',
+            'preto' : 'pretas',
 
-    #Para cada tipo de peça, também haverá uma lista com as casas iniciais que as peças desse tipo irão ocupar.
-    for tipo_peça, casas_iniciais in cfg.tabuleiro_inicial.items():
+            'branca' : 'brancas',
+            'branco' : 'brancas'
+        }
 
-        #O tipo de peça é definido pela peça e por sua cor. Exemplo: torre_preta.
-        peça = tipo_peça.split('_')[0]
-        cor = tipo_peça.split('_')[1]
+        #Para cada tipo de peça, também haverá uma lista com as casas iniciais que as peças desse tipo irão ocupar.
+        for tipo_peça, casas_iniciais in cfg.tabuleiro_inicial.items():
 
-        #Criando as torres do tabuleiro inicial.
-        if peça == 'torre':
-            
-            for casa in casas_iniciais:
-                    
-                torre = Torre(cor, casa, tam_tabuleiro, info_peças) #Cria o objeto da torre.
-                torre.criar_imagem(dict_icons[tipo_peça]) #Cria a sua imagem desenhável de acordo com seu tipo e cor.
-                grupo = cor_info[cor] #Associa ela ao grupo que pertence conforme sua cor.
-                info_peças[grupo].append(torre) #Adiciona ela no dicionário de todas as peças de acordo com seu grupo de cor.
+            #O tipo de peça é definido pela peça e por sua cor. Exemplo: torre_preta.
+            peça = tipo_peça.split('_')[0]
+            cor = tipo_peça.split('_')[1]
 
-        elif peça == 'peão':
-
-            for casa in casas_iniciais:
-                    
-                peão = Peão(cor, casa, tam_tabuleiro, info_peças) #Cria o objeto do peão.
-                peão.criar_imagem(dict_icons[tipo_peça])
-                grupo = cor_info[cor]
-                info_peças[grupo].append(peão)
-
-        elif peça == 'rei':
-            for casa in casas_iniciais:
-                rei = Rei(cor, casa, tam_tabuleiro, info_peças)  # Cria o objeto do rei.
-                rei.criar_imagem(dict_icons[tipo_peça])  # Cria a sua imagem desenhável de acordo com seu tipo e cor.
-                grupo = cor_info[cor]  # Associa ele ao grupo que pertence conforme sua cor.
-                info_peças[grupo].append(rei)  # Adiciona ele no dicionário de todas as peças de acordo com seu grupo de cor.
-
-        elif peça == 'rainha':  
-          for casa in casas_iniciais:
-            rainha = Rainha(cor, casa, tam_tabuleiro, info_peças)  # Cria o objeto da rainha.
-            rainha.criar_imagem(dict_icons[tipo_peça])  # Associa a imagem correta.
-            grupo = cor_info[cor]  # Define a qual grupo pertence.
-            info_peças[grupo].append(rainha)  # Adiciona no dicionário das peças.
-
-        elif peça == 'bispo':
-            for casa in casas_iniciais:
-                bispo = Bispo(cor, casa, tam_tabuleiro, info_peças)
-                bispo.criar_imagem(dict_icons[tipo_peça])
-                grupo = cor_info[cor]
-                info_peças[grupo].append(bispo)
+            #Criando as torres do tabuleiro inicial.
+            if peça == 'torre':
                 
-        elif peça == 'cavalo':
-            for casa in casas_iniciais:
-                cavalo = Cavalo(cor, casa, tam_tabuleiro, info_peças)
-                cavalo.criar_imagem(dict_icons[tipo_peça])
-                grupo = cor_info[cor]
-                info_peças[grupo].append(cavalo)
-                
-    return info_peças
+                for casa in casas_iniciais:
+                        
+                    torre = Torre(cor, casa, tam_tabuleiro, info_peças) #Cria o objeto da torre.
+                    torre.criar_imagem(dict_icons[tipo_peça]) #Cria a sua imagem desenhável de acordo com seu tipo e cor.
+                    grupo = cor_info[cor] #Associa ela ao grupo que pertence conforme sua cor.
+                    info_peças[grupo].append(torre) #Adiciona ela no dicionário de todas as peças de acordo com seu grupo de cor.
+
+            elif peça == 'peão':
+
+                for casa in casas_iniciais:
+                        
+                    peão = Peão(cor, casa, tam_tabuleiro, info_peças) #Cria o objeto do peão.
+                    peão.criar_imagem(dict_icons[tipo_peça])
+                    grupo = cor_info[cor]
+                    info_peças[grupo].append(peão)
+
+            elif peça == 'rei':
+                for casa in casas_iniciais:
+                    rei = Rei(cor, casa, tam_tabuleiro, info_peças)  # Cria o objeto do rei.
+                    rei.criar_imagem(dict_icons[tipo_peça])  # Cria a sua imagem desenhável de acordo com seu tipo e cor.
+                    grupo = cor_info[cor]  # Associa ele ao grupo que pertence conforme sua cor.
+                    info_peças[grupo].append(rei)  # Adiciona ele no dicionário de todas as peças de acordo com seu grupo de cor.
+
+            elif peça == 'rainha':  
+                for casa in casas_iniciais:
+                    rainha = Rainha(cor, casa, tam_tabuleiro, info_peças)  # Cria o objeto da rainha.
+                    rainha.criar_imagem(dict_icons[tipo_peça])  # Associa a imagem correta.
+                    grupo = cor_info[cor]  # Define a qual grupo pertence.
+                    info_peças[grupo].append(rainha)  # Adiciona no dicionário das peças.
+
+            elif peça == 'bispo':
+                for casa in casas_iniciais:
+                    bispo = Bispo(cor, casa, tam_tabuleiro, info_peças)
+                    bispo.criar_imagem(dict_icons[tipo_peça])
+                    grupo = cor_info[cor]
+                    info_peças[grupo].append(bispo)
+                    
+            elif peça == 'cavalo':
+                for casa in casas_iniciais:
+                    cavalo = Cavalo(cor, casa, tam_tabuleiro, info_peças)
+                    cavalo.criar_imagem(dict_icons[tipo_peça])
+                    grupo = cor_info[cor]
+                    info_peças[grupo].append(cavalo)
+                    
+        return info_peças
+
+    #Definindo as posições iniciais de todas as peças.
+    info_peças = posições_iniciais_peças()
+
+    #Definindo a vez inicial.
+    vez = 'brancas'
+
+    #Reiniciando a side-bar.
+    for grupo_cor in sidebar_contagem['textos']:
+
+        sidebar_contagem['textos'][grupo_cor] = _init_textos(sidebar_contagem['ícones'][grupo_cor])
+
+    return info_peças, vez, sidebar_contagem
 
 #Função para desenhar todas as peças no tabuleiro.
 def desenhar_peças(tela, info_peças):

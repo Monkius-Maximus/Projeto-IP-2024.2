@@ -156,7 +156,7 @@ while usr_jogando:
         elif tela_atual == 'menu':
 
             #Eventos de menu são resolvidos e a tela atual é atualizada. Além disso, quando o usuário apertar em 'Jogar', as informações sobre as peças são adicionadas na variável info_peças. Para isso, é necessário o uso da biblioteca dict_icons, para associar cada peça ao seu png. O retângulo do botão de jogar é passado para saber se o usuário clicou no botão.
-            tela_atual, info_peças = fj.eventos_menu(evento, jogar.get_rect(topleft=pos_jogar), dict_icons, tam_tabuleiro)
+            tela_atual, info_peças, vez, sidebar_contagem = fj.eventos_menu(evento, jogar.get_rect(topleft=pos_jogar), dict_icons, tam_tabuleiro, sidebar_contagem)
 
         #Se a tela for do jogo de xadrez e se não for a tela do fim (empate ou ganhar), lida-se com os eventos interessantes que a tela do xadrez pode receber. Por isso o comparativo do == é usado neste caso.
         elif tela_atual == 'xadrez':
@@ -169,7 +169,7 @@ while usr_jogando:
         #Caso a tela atual seja a tela do final do jogo, ou seja, empate ou alguém venceu. Os eventos verificados para essas telas possíveis são os mesmos eventos.
         else:
             
-            tela_atual = fj.eventos_tela_final(tela_atual, evento)
+            tela_atual, info_peças, vez, sidebar_contagem = fj.eventos_tela_final(tela_atual, evento, dict_icons, tam_tabuleiro, info_peças, vez, sidebar_contagem)
     
     #Desenhando as coisas no aplicativo de acordo com a tela do menu.
     if tela_atual == 'menu':
