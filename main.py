@@ -83,7 +83,7 @@ capa_menu = pygame.image.load('imagens/capa_menu.jpeg')
 capa_menu = pygame.transform.scale(capa_menu, (tela_x, tela_y))
 
 #Importando a imagem da sidebar.
-img_sidebar = pygame.image.load('imagens/imagem_sidebar.png')
+img_sidebar = pygame.image.load('imagens/imagem_sidebar.jpeg')
 x_img_sidebar = tela_x - tam_tabuleiro
 y_img_sidebar = tela_y
 img_sidebar = pygame.transform.scale(img_sidebar, (x_img_sidebar, y_img_sidebar))

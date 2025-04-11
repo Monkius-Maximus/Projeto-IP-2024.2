@@ -425,7 +425,6 @@ def eventos_xadrez(tam_tabuleiro, evento, casa_origem, info_peças, vez, sidebar
                 
                 #Move a peça.
                 peça_selecionada.mover_peça(casa_clicada, info_peças, tam_tabuleiro)
-                print(f'{peça_selecionada.movida}')
 
                 #Se o usuário de alguma cor acabou de se mover, então é certo que o rei dele não está mais em xeque, pelas regras. Portanto, o elemento em_xeque do rei dele se torna False, e os elementos dando_xeque das peças opostas se tornam todos False.
                 for peça in info_peças[vez]:
