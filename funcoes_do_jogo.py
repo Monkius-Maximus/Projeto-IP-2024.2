@@ -77,7 +77,7 @@ def _init_jogar(tela_x, tela_y):
 
     #Definindo posição do botão segundo o referencial da tela.
     jogar_x = (tela_x) / 2 - (x_jogar_redim / 2)
-    jogar_y = (tela_y) / 2 - (y_jogar_redim / 2)
+    jogar_y = (tela_y) / 2 - (y_jogar_redim / 2) + 265
     pos_jogar = (jogar_x, jogar_y)
 
     #Retorna-se o botão e sua posição.
@@ -148,7 +148,7 @@ def _init_brancas_capturadas(torre_branca_pequena,
     return brancas_capturadas
 
 #Função para inicializar os textos das peças na sidebar. Pode ser usado para brancas ou pretas.
-def _init_textos(peças_capturadas):
+def _init_textos(peças_capturadas, tam_real_sidebar):
     
     textos = {}
 
@@ -161,6 +161,14 @@ def _init_textos(peças_capturadas):
         antialais = True
         texto_atual = ' -> 0'
         txt_sidebar = fonte_título.render(texto_atual, antialais, cfg.cor_txt_sidebar)
+
+        #Redimensionando tamanho com uma regra de três, levando em consideração o tamanho real da peça na sidebar.
+        tam_x, tam_y = txt_sidebar.get_size()
+
+        redim_tam_x = (tam_real_sidebar * tam_x) / cfg.tam_peça_sidebar
+        redim_tam_y = (tam_real_sidebar * tam_y) / cfg.tam_peça_sidebar
+
+        txt_sidebar = pygame.transform.scale(txt_sidebar, (redim_tam_x, redim_tam_y))
 
         pos_txt_sidebar = (x + cfg.tam_peça_sidebar + 5, y)
 
@@ -240,7 +248,7 @@ def importar_peças(peça_png, tabuleiro):
     return peça, peça_pequena
 
 #Função para lidar com os eventos do menu. Info_peças começa sendo um dicionário vazio, pois ainda estamos no menu e o usuário ainda não escolheu jogar.
-def eventos_menu(evento, jogar_rect, dict_icons, tam_tabuleiro, sidebar_contagem, info_peças = {}, vez = ''):
+def eventos_menu(evento, jogar_rect, dict_icons, tam_tabuleiro, sidebar_contagem, tam_real_sidebar, info_peças = {}, vez = ''):
 
     #Quando se verifica um evento da tela menu, a tela atual é o menu. Mas, poderá mudar, caso o usuário tenha decidido mudar de tela. Exemplo: decidindo jogar o xadrez
     tela_atual = 'menu'
@@ -255,7 +263,7 @@ def eventos_menu(evento, jogar_rect, dict_icons, tam_tabuleiro, sidebar_contagem
             tela_atual = 'xadrez'
 
             #Como o usuário está começando a jogar agora, é necessário definir as informações iniciais das peças do tabuleiro.
-            info_peças, vez, sidebar_contagem = iniciar_novo_jogo(dict_icons, tam_tabuleiro, sidebar_contagem)
+            info_peças, vez, sidebar_contagem = iniciar_novo_jogo(dict_icons, tam_tabuleiro, sidebar_contagem, tam_real_sidebar)
 
     return tela_atual, info_peças, vez, sidebar_contagem
 
@@ -504,7 +512,7 @@ def eventos_xadrez(tam_tabuleiro, evento, casa_origem, info_peças, vez, sidebar
     return tela_atual, casa_origem, info_peças, vez
 
 #Função para lidar com os eventos da tela final (quando deu empate ou alguém venceu a partida).
-def eventos_tela_final(tela_atual, evento, dict_icons, tam_tabuleiro, info_peças, vez, sidebar_contagem):
+def eventos_tela_final(tela_atual, evento, dict_icons, tam_tabuleiro, info_peças, vez, sidebar_contagem, tam_real_sidebar):
 
     #Se uma tecla foi clicada.
     if evento.type == pygame.KEYDOWN:
@@ -533,17 +541,18 @@ def eventos_tela_final(tela_atual, evento, dict_icons, tam_tabuleiro, info_peça
         elif evento.key == pygame.K_RETURN:
 
             tela_atual = 'xadrez'
-            info_peças, vez, sidebar_contagem = iniciar_novo_jogo(dict_icons, tam_tabuleiro, sidebar_contagem)
+            info_peças, vez, sidebar_contagem = iniciar_novo_jogo(dict_icons, tam_tabuleiro, sidebar_contagem, tam_real_sidebar)
 
     return tela_atual, info_peças, vez, sidebar_contagem
 
 #Função para fazer os desenhos da tela menu.
-def desenhar_menu(tela, jogar, pos_jogar, txt_menu, pos_txt_menu):
+def desenhar_menu(tela, capa_menu, jogar, pos_jogar, txt_menu, pos_txt_menu):
 
-    #Pinta-se o fundo da tela de roxo, eliminando objetos antigos.
-    tela.fill('purple')
+    #Pinta-se o fundo da tela de preto, eliminando objetos antigos.
+    tela.fill((0, 0, 0))
 
     #Desenha-se as coisas na tela.
+    tela.blit(capa_menu, (0, 0))
 
     #Desenhando o botão jogar na tela.
     tela.blit(jogar, pos_jogar)
@@ -658,7 +667,7 @@ def desenhar_tela_final(tela, filtro, venceram):
         desenhar_fim(tela, f'{venceram.capitalize()} venceram!')
 
 #Função que inicia um novo jogo. Define as informações iniciais sobre as peças em cada casa, define a vez das peças como sendo as brancas e reinicia a side-bar. O dicionário é passado porque, para cada peça, é necessário saber qual é o png associado a ela de acordo com seu tipo.
-def iniciar_novo_jogo(dict_icons, tam_tabuleiro, sidebar_contagem):
+def iniciar_novo_jogo(dict_icons, tam_tabuleiro, sidebar_contagem, tam_real_sidebar):
 
     def posições_iniciais_peças():
 
@@ -742,7 +751,7 @@ def iniciar_novo_jogo(dict_icons, tam_tabuleiro, sidebar_contagem):
     #Reiniciando a side-bar.
     for grupo_cor in sidebar_contagem['textos']:
 
-        sidebar_contagem['textos'][grupo_cor] = _init_textos(sidebar_contagem['ícones'][grupo_cor])
+        sidebar_contagem['textos'][grupo_cor] = _init_textos(sidebar_contagem['ícones'][grupo_cor], tam_real_sidebar)
 
     return info_peças, vez, sidebar_contagem
 
