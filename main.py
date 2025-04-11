@@ -2,6 +2,8 @@ import pygame, os
 import funcoes_do_jogo as fj
 import configuracoes as cfg
 import copy
+from funcoes_do_jogo import verificar_empate, material_insuficiente
+
 
 #Limpa o terminal para fazer impressões.
 os.system('clear')
@@ -171,6 +173,10 @@ while usr_jogando:
            tela_atual, casa_origem, info_peças, vez = fj.eventos_xadrez(
            tam_tabuleiro, evento, casa_origem, info_peças, vez, sidebar_contagem
            )
+
+        if casa_origem == () and 'brancas' in info_peças and 'pretas' in info_peças:
+         if verificar_empate(info_peças, vez) or material_insuficiente(info_peças):
+          tela_atual = 'xadrez_empate'
         
         #Caso a tela atual seja a tela do final do jogo, ou seja, empate ou alguém venceu. Os eventos verificados para essas telas possíveis são os mesmos eventos.
         else:

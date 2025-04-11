@@ -780,3 +780,34 @@ def esta_em_xeque_mate(info_peças, cor):
             xeque_mate = False
 
     return xeque_mate
+
+def verificar_empate(info_peças, vez):
+    grupo_jogador = info_peças[vez]
+    adversario = 'brancas' if vez == 'pretas' else 'pretas'
+
+    rei = next((p for p in grupo_jogador if p.tipo == 'rei'), None)
+    if not rei or rei.em_xeque:
+        return False
+
+    for peça in grupo_jogador:
+        movimentos = peça.movimentos_possíveis(info_peças)
+        movimentos = peça.rem_lances_inválidos(info_peças, movimentos)
+
+        if movimentos:
+            return False
+
+    return True
+
+
+def material_insuficiente(info_peças):
+    peças_atuais = info_peças['brancas'] + info_peças['pretas']
+    tipos = [p.tipo for p in peças_atuais if p.tipo != 'rei']
+
+    if not tipos:
+        return True
+    if len(tipos) == 1 and tipos[0] in ['bispo', 'cavalo']:
+        return True
+
+    return False
+
+
