@@ -13,7 +13,6 @@ pygame.init()
 som_captura = pygame.mixer.Sound('sons/movimento_peça.mp3')
 
 #Inicia o mixer do pygame para o jogo ter sons
-
 pygame.mixer.init()
 
 #Sobre o menu.
@@ -57,13 +56,6 @@ musica_fundo = pygame.mixer.Sound('sons/musica_fundo.mp3')
 
 # música de fundo está tocando ou não
 musica_tocando = False
-
-# Se a música de fundo não estiver tocando e o jogo não estiver terminado
-if tela_atual == 'menu':
-        # Toca a música de fundo em loop
-        musica_fundo.play(loops=-1)
-        # Define a variável para indicar que a música está tocando
-        musica_tocando = True
 
 #Sobre a tela do xadrez.
 
@@ -200,6 +192,16 @@ while usr_jogando:
         else:
             
             tela_atual, info_peças, vez, sidebar_contagem = fj.eventos_tela_final(tela_atual, evento, dict_icons, tam_tabuleiro, info_peças, vez, sidebar_contagem, tam_real_sidebar)
+
+    # Gerenciamento da música de fundo
+    if tela_atual == 'menu' and not musica_tocando:
+        # Inicia a música apenas se estivermos no menu e ela não estiver tocando
+        musica_fundo.play(loops=-1)
+        musica_tocando = True
+    elif tela_atual != 'menu' and musica_tocando:
+        # Para a música se saímos do menu e ela estiver tocando
+        musica_fundo.stop()
+        musica_tocando = False
 
     #Desenhando as coisas no aplicativo de acordo com a tela do menu.
     if tela_atual == 'menu':
